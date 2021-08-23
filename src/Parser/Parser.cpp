@@ -66,6 +66,47 @@ Savegame loadSavegame(const std::string& filepath)
 		}
 	}
 
+}
+
+War convertToWar(const std::vector<std::string>& rawLines)
+{
+	War w;
+
 	
-	
+	std::string name;
+
+	std::string t1;
+	std::string t2;
+
+	bool parsingToken = true;
+
+	for(const auto& token : rawLines)
+	{
+		for(const auto t : token)
+		{
+			if(parsingToken)
+			{
+				if(t == '=')
+				{
+					parsingToken = false;
+				}
+				else
+				{
+					t1.push_back(t);
+				}
+			}
+			else
+			{
+				if((t == '\n') || (token.back() == '\"'))
+				{
+					parsingToken = true;
+				}
+				else
+				{	
+					t2.push_back(t);
+				}	
+			}
+			
+		}
+	}
 }
