@@ -251,7 +251,21 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				//Others
 				case '\n':
 				{
-					isLeftOperand = false;
+					isLeftOperand = true;
+
+					if(bracketDepth >= 3)
+					{
+						break;
+					}
+
+					if(currentSection == name) { w.name = stringliteral; break; }
+					if(currentSection == battle) { break; }
+					if(currentSection == history) { /*currentSection = history;*/ break; }
+					if(currentSection == original_wargoal) { /*currentSection = original_wargoal;*/ break; }
+					if(currentSection == original_defender) { w.defenders.emplace_back(original_defender); break; }
+					if(currentSection == original_attacker) { w.attackers.emplace_back(original_attacker); break; }
+					if(currentSection == casus_belli) { w.wargoal = casus_belli; break; }
+
 					break;
 				}
 				case '=':
@@ -288,15 +302,27 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 
 			if(strLiteral) { stringliteral.append(token); continue; }
 
-			if(token == name) { currentSection = name; continue; }
-			if(token == battle) { currentSection = battle; continue; }
-			if(token == name) { currentSection = name; continue; }
-			if(token == name) { currentSection = name; continue; }
-			if(token == name) { currentSection = name; continue; }
-			if(token == name) { currentSection = name; continue; }
-			if(token == name) { currentSection = name; continue; }
-		}
+			if(isLeftOperand)
+			{
+				if(token == name) { currentSection = name; continue; }
+				if(token == battle) { currentSection = battle; continue; }
+				if(token == history) { currentSection = history; continue; }
+				if(token == original_wargoal) { currentSection = original_wargoal; continue; }
+				if(token == original_defender) { currentSection = original_defender; continue; }
+				if(token == original_attacker) { currentSection = original_attacker; continue; }
+				if(token == casus_belli) { currentSection = casus_belli; continue; }
 
+				currentSection = "";
+			}
+
+			/*if(currentSection == name) { currentSection = name; continue; }
+			if(currentSection == battle) { currentSection = battle; continue; }
+			if(currentSection == history) { currentSection = history; continue; }
+			if(currentSection == original_wargoal) { currentSection = original_wargoal; continue; }
+			if(currentSection == original_defender) { currentSection = original_defender; continue; }
+			if(currentSection == original_attacker) { currentSection = original_attacker; continue; }
+			if(currentSection == casus_belli) { currentSection = casus_belli; continue; }*/	
+		}
 	}
 
 	return w;
@@ -305,6 +331,154 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 Battle convertToBattle(const std::vector<std::string>& tokenStream)
 {
 	Battle b;
+
+	std::cout << "BATTLE TOKEN STREAM:\n";
+	for(const auto& t : tokenStream)
+	{
+		std::cout << t;
+	}
+	std::cout << "\nEND BATTLE TOKEN STREAM\n\n";
+
+	const std::string battle = "battle";
+	const std::string name = "name";
+	const std::string location = "location";
+	const std::string result = "result";
+	const std::string attacker = "attacker";
+	const std::string defender = "defender";
+
+	const std::string country = "country";
+	const std::string leader = "leader";
+	const std::string losses = "losses";
+
+	//Scope and Flags
+	int scopeDepth = 0; //Everytime there is '{', increment, and when '}', decrement
+	int bracketDepth = 0; //Everytime there is '[', increment, and when ']', decrement
+	int parenthesisDepth = 0; //Everytime there is '(', increment, and when ')', decrement
+	bool strLiteral = false; //Toggle when '"' is encountered, when true, directly parse everything into the lvalue operand
+	bool isLeftOperand = true; 
+
+	bool isActualBattle = false;
+	
+	int sideStatus = 0; //0 is none, 1 is atk, 2 is def
+
+	std::string currentSection = "";
+	std::string stringliteral;
+	std::string unitname;
+
+	for(auto index = 0; index < tokenStream.size(); ++index)
+	{
+		const auto& token = tokenStream[index];
+
+		if(isToken(token.at(0)))
+		{
+			switch (token.at(0))
+			{	//Begin Switch
+				case '"':
+				{
+					if(strLiteral)
+					{
+						strLiteral = false;
+					}
+					else
+					{
+						stringliteral.clear();
+						strLiteral = true;
+					}
+
+					break;
+				}
+				case '(':
+				{
+					parenthesisDepth += 1;
+					break;
+				}
+				case ')':
+				{
+					parenthesisDepth -= 1;
+					break;
+				}
+				case '[':
+				{
+					bracketDepth += 1;
+					break;
+				}
+				case ']':
+				{
+					bracketDepth -= 1;
+					break;
+				}
+				case '{':
+				{
+					scopeDepth += 1;
+					break;
+				}
+				case '}':
+				{
+					scopeDepth -= 1;
+					break;
+				}
+
+				//Others
+				case '\n':
+				{
+					isLeftOperand = true;
+
+					if(currentSection == name) { b.name = stringliteral; break; }
+					if(currentSection == battle) { break; }
+					if(currentSection == location) { b.location = std::stoi(stringliteral); break; }
+					if(currentSection == result) { (stringliteral == "yes") ? b.doesAttackerWin = true : b.doesAttackerWin = false; break; }
+					if(currentSection == attacker) { sideStatus = 1; break; }
+					if(currentSection == defender) { sideStatus = 2; break; }
+					if(currentSection == country) { (sideStatus > 1) ? b.countryDEF = stringliteral: b.countryATK = stringliteral; break; }
+					if(currentSection == leader) { (sideStatus > 1) ? b.leaderDEF = stringliteral: b.leaderATK = stringliteral; break; }
+					if(currentSection == losses) { (sideStatus > 1) ? b.deflosses = std::stoi(stringliteral): b.atklosses = std::stoi(stringliteral); break; }
+					
+					if(currentSection == "unit") 
+					{
+						Unit u;
+						u.name = unitname;
+						u.size = std::stoi(stringliteral);
+
+						(sideStatus > 1) ? b.defUnits.emplace_back(u): b.atkUnits.emplace_back(u);
+					}
+					
+
+					break;
+				}
+				case '=':
+				{
+					isLeftOperand = false;
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+			}	//End Switch
+		}
+		else
+		{
+
+			if(strLiteral) { stringliteral.append(token); continue; }
+
+			if(isLeftOperand)
+			{
+				if(token == name) { currentSection = name; continue; }
+				if(token == battle) { currentSection = battle; continue; }
+				if(token == location) { currentSection = location; continue; }
+				if(token == result) { currentSection = result; continue; }
+				if(token == attacker) { currentSection = attacker; continue; }
+				if(token == defender) { currentSection = defender; continue; }
+				if(token == country) { currentSection = country; continue; }
+				if(token == leader) { currentSection = leader; continue; }
+				if(token == losses) { currentSection = losses; continue; }
+
+				currentSection = "unit";
+				unitname = token;
+			}
+		}
+	}
 
 	return b;
 }
