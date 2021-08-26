@@ -99,6 +99,7 @@ void WarAnalyzeState::updateGUI()
 		if(ImGui::Button("Load"))
 		{
 			save = loadSavegame("testdata/Testsave.v2");
+			loaded = true;
 		}
 		
 		ImGui::Separator();

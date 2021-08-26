@@ -23,7 +23,7 @@ static inline bool contains(const std::string& parentString, const std::string& 
 	{
 		return false;
 	}
-	
+
 	if(parentString.find(containStr) != std::string::npos)
 	{
 		return true;
@@ -60,46 +60,34 @@ Savegame loadSavegame(const std::string& filepath)
 	stream << file.rdbuf();
 	file.close();
 
+	std::cout << "The stream has been loaded. There are " << stream.str().length() << " characters.\n";
+
 	Date d;
 
 	
 
 	std::vector<std::vector<std::string>> info;
-	bool continueLoop = true;
-	std::string buffer = "";
 
-	//This loop for now just gets the sections that are for wars
-	while(continueLoop)
+	for(std::string buffer; std::getline(stream, buffer, '\n'); )
 	{
-		// contains(warStart, buffer)
 		if(lineContainsWarStart(buffer))
 		{
+			std::cout << "Found War!\n";
+
 			std::vector<std::string> lines;
+			std::getline(stream, buffer, '\n');
 
-			std::getline(stream, buffer);
-			//stream >> buffer;
-
-
-			while(!lineContainsWarStart(buffer))	//buffer != warStart
+			while(!lineContainsWarStart(buffer))
 			{
 				lines.emplace_back(buffer);
 
-				std::getline(stream, buffer);
+				std::getline(stream, buffer, '\n');
+				buffer.push_back('\n');
 			}
 
 			info.emplace_back(lines);
 		}
-		else
-		{
-			std::getline(stream, buffer);
-			
-			if(stream.eof())
-			{
-				continueLoop = false;
-			}
-		}
 	}
-	//---//
 
 	
 	//This can be parallelized as long as the order for [warTokens] tokens is the same
@@ -118,6 +106,7 @@ Savegame loadSavegame(const std::string& filepath)
 
 		}
 		warsTokens.push_back(warTokensVec);
+		std::cout << "Made a war token list.\n";
 	}
 
 	Savegame savegame;
@@ -125,6 +114,7 @@ Savegame loadSavegame(const std::string& filepath)
 	for(const auto& wtoken : warsTokens)
 	{
 		savegame.addWar(convertToWar(wtoken));
+		std::cout << "Made a war.\n";
 	}
 
 	return savegame;
