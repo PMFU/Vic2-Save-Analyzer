@@ -1,5 +1,7 @@
 #include "WarAnalyzeState.h"
 
+#include "../Data/Savegame.h"
+#include "../Parser/Parser.h"
 
 WarAnalyzeState::WarAnalyzeState(Application& app)	:	Basestate(app)
 {
@@ -79,14 +81,43 @@ void WarAnalyzeState::updateGUI()
 	static bool showwindow = false;
 	static bool consolewindow = false;
 
+	static Savegame save;
+
 	static uint8_t indexTab = 1;
 	static std::vector<int> imgIDs = { 1 }; 
+	static bool loaded = false;
 
 	auto& io = ImGui::GetIO();
 
 	constexpr auto windowflag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;// | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
 
+	if(ImGui::Begin("Big Screen", nullptr, windowflag))
+	{
+		ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
+		ImGui::SetWindowSize(io.DisplaySize);
 
+		if(ImGui::Button("Load"))
+		{
+			save = loadSavegame("testdata/Testsave.v2");
+		}
+		
+		ImGui::Separator();
+
+		if(loaded)
+		{
+			const auto& wars = save.getWars();
+			ImGui::Text("Wars: ");
+
+			for(const auto& [name, war] : wars)
+			{
+				ImGui::TextWrapped("Name: %s, Winner: %s, Battles: %zu", 
+					name.c_str(),
+					(war.doesAttackerWin ? war.attackers.at(0) : war.defenders.at(0)),
+					war.battles.size());
+			}
+		}
+	}
+	ImGui::End();
 }
 
 void WarAnalyzeState::render(Renderer* renderer)

@@ -19,6 +19,11 @@ static const std::string warStart = "previous_war=";
 
 static inline bool contains(const std::string& parentString, const std::string& containStr)
 {
+	if(parentString.empty() || containStr.empty())
+	{
+		return false;
+	}
+	
 	if(parentString.find(containStr) != std::string::npos)
 	{
 		return true;
@@ -53,6 +58,7 @@ Savegame loadSavegame(const std::string& filepath)
 
 	std::stringstream stream;
 	stream << file.rdbuf();
+	file.close();
 
 	Date d;
 
