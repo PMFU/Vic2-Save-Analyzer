@@ -111,10 +111,10 @@ void WarAnalyzeState::updateGUI()
 
 			for(const auto& [name, war] : wars)
 			{
-				ImGui::TextWrapped("Name: %s, Winner: %s, Battles: %zu", 
-					name.c_str(),
-					(war.doesAttackerWin ? war.attackers.at(0).c_str() : war.defenders.at(0).c_str()),
-					war.battles.size());
+				ImGui::Text("Name: %s, %f",//Winner: %s, Battles: %zu", 
+					name.c_str(), 1.0f);
+					//(war.doesAttackerWin ? war.attackers.at(0).c_str() : war.defenders.at(0).c_str()),
+					//war.battles.size());
 			}
 		}
 	}

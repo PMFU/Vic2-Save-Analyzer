@@ -64,8 +64,6 @@ Savegame loadSavegame(const std::string& filepath)
 
 	Date d;
 
-	
-
 	std::vector<std::vector<std::string>> info;
 
 	for(std::string buffer; std::getline(stream, buffer, '\n'); )
@@ -76,8 +74,9 @@ Savegame loadSavegame(const std::string& filepath)
 
 			std::vector<std::string> lines;
 			std::getline(stream, buffer, '\n');
+			buffer.push_back('\n');
 
-			while(!lineContainsWarStart(buffer))
+			while((!lineContainsWarStart(buffer)) && (buffer != "}\n"))
 			{
 				lines.emplace_back(buffer);
 
@@ -90,7 +89,6 @@ Savegame loadSavegame(const std::string& filepath)
 					buffer.push_back('\n');
 					break;
 				}
-				
 				
 			}
 
@@ -130,9 +128,11 @@ Savegame loadSavegame(const std::string& filepath)
 		{
 			continue;
 		}
-
-		savegame.addWar(convertToWar(wtoken));
-		std::cout << "Made a war.\n";
+		else
+		{
+			savegame.addWar(convertToWar(wtoken));
+			std::cout << "Made a war.\n";
+		}
 	}
 
 	return savegame;

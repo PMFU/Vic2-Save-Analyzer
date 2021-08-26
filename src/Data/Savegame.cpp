@@ -2,7 +2,15 @@
 
 Savegame::Savegame()
 {
+	//Test war
+	War w;
+	w.attackers.emplace_back("RUS");
+	w.defenders.emplace_back("GER");
+	w.doesAttackerWin = false;
+	w.name = "Testing war";
+	w.wargoal = "There is none, this is a test";
 
+	m_warsmap.insert(std::pair(w.name, w));
 }
 
 Savegame::~Savegame()
