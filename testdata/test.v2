@@ -1,0 +1,237 @@
+
+
+previous_war=
+{
+	name="American War of Independence"
+	history=
+	{
+		name="American War of Independence"
+		1775.4.19=
+		{
+			add_attacker="USA"
+		}
+		1775.4.19=
+		{
+			add_defender="ENG"
+		}
+		1775.4.19=
+		{
+			war_goal=
+			{
+				casus_belli="become_independent"
+				actor="USA"
+				receiver="ENG"
+			}
+		}
+		1783.9.3=
+		{
+			rem_attacker="USA"
+		}
+		1783.9.3=
+		{
+			rem_defender="ENG"
+		}
+	}
+	original_attacker="---"
+	original_defender="---"
+	original_wargoal=
+	{
+	}
+	action="1.1.1"
+}
+previous_war=
+{
+	name="Egyptian Transfer of Egyptian Greece to The Ottoman Empire"
+	history=
+	{
+		1836.4.19=
+		{
+			add_attacker="TUR"
+		}
+		1836.4.19=
+		{
+			add_defender="EGY"
+		}
+		1836.4.20=
+		{
+			add_defender="NEJ"
+		}
+		1836.6.4=
+		{
+			rem_attacker="TUR"
+		}
+		1836.6.4=
+		{
+			rem_defender="EGY"
+		}
+		1836.6.4=
+		{
+			rem_defender="NEJ"
+		}
+	}
+	original_attacker="TUR"
+	original_defender="EGY"
+	original_wargoal=
+	{
+		state_province_id=847
+		casus_belli="negotiated_transfer"
+		actor="TUR"
+		receiver="EGY"
+	}
+	action="1836.4.19"
+}
+previous_war=
+{
+	name="Dutch Restoration of Order to the Belgian provinces"
+	history=
+	{
+		battle=
+		{
+			name="Antwerp"
+			location=390
+			result=yes
+			attacker=
+			{
+				country="NET"
+				leader="Ferdinand Foch"
+				artillery=82017
+				hussar=16482
+				infantry=89316
+				losses=83113
+			}
+			defender=
+			{
+				country="BEL"
+				leader="Albert Goblet d'Alviella"
+				artillery=28500
+				hussar=5700
+				infantry=98400
+				losses=85476
+			}
+		}
+		battle=
+		{
+			name="Li觥"
+			location=395
+			result=yes
+			attacker=
+			{
+				country="FRA"
+				leader="Louis-Isidore Harispe"
+				artillery=14250
+				hussar=2850
+				infantry=11400
+				losses=307
+			}
+			defender=
+			{
+				country="BEL"
+				leader="Albert Prisse"
+				infantry=3000
+				losses=2884
+			}
+		}
+		battle=
+		{
+			name="Ghent"
+			location=389
+			result=yes
+			attacker=
+			{
+				country="FRA"
+				leader="Ferdinand Foch"
+				artillery=60547
+				hussar=11521
+				infantry=47594
+				losses=30881
+			}
+			defender=
+			{
+				country="BEL"
+				leader="Albert Goblet d'Alviella"
+				artillery=18279
+				infantry=23168
+				losses=19927
+			}
+		}
+		battle=
+		{
+			name="Tournai"
+			location=393
+			result=yes
+			attacker=
+			{
+				country="FRA"
+				leader="Ferdinand Foch"
+				artillery=65203
+				hussar=13658
+				infantry=38186
+				losses=3761
+			}
+			defender=
+			{
+				country="BEL"
+				leader="G鲡rd Mathieu Leman"
+				artillery=13414
+				infantry=8106
+				losses=20969
+			}
+		}
+		battle=
+		{
+			name="Coast of Holland"
+			location=2722
+			result=yes
+			attacker=
+			{
+				country="NET"
+				leader="Engelbertus Lucas"
+				clipper_transport=2
+				frigate=10
+				manowar=3
+				losses=0
+			}
+			defender=
+			{
+				country="BEL"
+				leader="Jean Lebeau"
+				clipper_transport=3
+				losses=6
+			}
+		}
+		1836.4.13=
+		{
+			add_attacker="NET"
+		}
+		1836.4.13=
+		{
+			add_defender="BEL"
+		}
+		1836.4.13=
+		{
+			add_attacker="FRA"
+		}
+		1836.9.3=
+		{
+			rem_defender="BEL"
+		}
+		1836.9.3=
+		{
+			rem_attacker="FRA"
+		}
+		1836.9.3=
+		{
+			rem_attacker="NET"
+		}
+	}
+	original_attacker="NET"
+	original_defender="BEL"
+	original_wargoal=
+	{
+		casus_belli="annex_core_country"
+		actor="NET"
+		receiver="BEL"
+	}
+	action="1836.7.4"
+}
+

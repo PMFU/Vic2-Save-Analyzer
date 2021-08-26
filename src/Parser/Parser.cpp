@@ -81,8 +81,17 @@ Savegame loadSavegame(const std::string& filepath)
 			{
 				lines.emplace_back(buffer);
 
-				std::getline(stream, buffer, '\n');
-				buffer.push_back('\n');
+				if(std::getline(stream, buffer, '\n'))
+				{
+					buffer.push_back('\n');
+				}
+				else
+				{
+					buffer.push_back('\n');
+					break;
+				}
+				
+				
 			}
 
 			info.emplace_back(lines);
@@ -105,14 +114,23 @@ Savegame loadSavegame(const std::string& filepath)
 			}
 
 		}
-		warsTokens.push_back(warTokensVec);
-		std::cout << "Made a war token list.\n";
+		
+		if(!warTokensVec.empty())
+		{
+			warsTokens.push_back(warTokensVec);
+			std::cout << "Made a war token list.\n";
+		}	
 	}
 
 	Savegame savegame;
 
 	for(const auto& wtoken : warsTokens)
 	{
+		if(wtoken.size() == 0)
+		{
+			continue;
+		}
+
 		savegame.addWar(convertToWar(wtoken));
 		std::cout << "Made a war.\n";
 	}
@@ -160,7 +178,7 @@ std::vector<std::string> tokenizeLine(const std::string& line)
 		curToken.clear();
 	}
 
-	std::cout << "Found " << tokens.size() << " tokens.\n";
+	// /std::cout << "Found " << tokens.size() << " tokens.\n";
 
 	return tokens;
 }
@@ -193,11 +211,16 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 	std::string currentSection = "";
 
 	std::vector<std::string> battleStream;
-	std::string stringliteral;
+	std::string stringliteral = "";
+
 
 	for(auto index = 0; index < tokenStream.size(); ++index)
 	{
 		const auto& token = tokenStream[index];
+		if(token.empty())
+		{
+			continue;
+		}
 
 		if(isToken(token.at(0)))
 		{
@@ -262,6 +285,8 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 					if(currentSection == original_attacker) { w.attackers.emplace_back(original_attacker); break; }
 					if(currentSection == casus_belli) { w.wargoal = casus_belli; break; }
 
+					currentSection.clear();
+
 					break;
 				}
 				case '=':
@@ -291,7 +316,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 					battleStream.pop_back();
 				}
 
-				w.battles.emplace_back(convertToBattle(battleStream));
+				//w.battles.emplace_back(convertToBattle(battleStream));
 
 				battleStream.clear();
 			}
@@ -308,16 +333,8 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				if(token == original_attacker) { currentSection = original_attacker; continue; }
 				if(token == casus_belli) { currentSection = casus_belli; continue; }
 
-				currentSection = "";
+				currentSection.clear();
 			}
-
-			/*if(currentSection == name) { currentSection = name; continue; }
-			if(currentSection == battle) { currentSection = battle; continue; }
-			if(currentSection == history) { currentSection = history; continue; }
-			if(currentSection == original_wargoal) { currentSection = original_wargoal; continue; }
-			if(currentSection == original_defender) { currentSection = original_defender; continue; }
-			if(currentSection == original_attacker) { currentSection = original_attacker; continue; }
-			if(currentSection == casus_belli) { currentSection = casus_belli; continue; }*/	
 		}
 	}
 
