@@ -6,6 +6,8 @@
 
 Savegame loadSavegame(const std::string& filepath);
 
-War convertToWar(const std::vector<std::string>& rawLines);
+std::vector<std::string> tokenizeLine(const std::string& line);
 
-// Battle convertToBattle
+War convertToWar(const std::vector<std::string>& tokenStream);
+
+Battle convertToBattle(const std::vector<std::string>& tokenStream);
