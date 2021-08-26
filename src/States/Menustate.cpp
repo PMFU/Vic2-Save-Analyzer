@@ -1,5 +1,6 @@
 #include "Menustate.h"
 
+#include "WarAnalyzeState.h"
 
 Menustate::Menustate(Application& app) : Basestate(app)
 {
@@ -30,12 +31,18 @@ bool Menustate::input(float dt)
 void Menustate::update(float dt)
 {
 	static uint8_t menuIndex = 1;
+	constexpr auto windowflag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
 
-
-	if(ImGui::Begin("Select Save"))
+	if(ImGui::Begin("Mode Selector", nullptr, windowflag))
 	{
-		
+		//ImGui::WindowS
+
+		if(ImGui::Button("War Analyzer"))
+		{
+			app.pushState(std::make_unique<WarAnalyzeState>(WarAnalyzeState(app)));
+		}
 	}
+
 	ImGui::End();
 
 	switch(menuIndex)

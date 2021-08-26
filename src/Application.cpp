@@ -1,7 +1,7 @@
 #include "Application.h"
 
 #include "Camera.h"
-#include "States/Gamestate.h"
+#include "States/WarAnalyzeState.h"
 #include "States/Menustate.h"
 
 
@@ -12,21 +12,6 @@ Application::Application()
 	// Loading screen
 	m_states.emplace_back(std::make_unique<Menustate>(*this));
 	
-
-	Job loadGame = jobSystem.createJob([&](Job j)
-	{	//create gamestate and add to gamestate vector
-		auto state = std::make_unique<GameState>(*this);
-
-		while(jobSystem.backgroundJobs() > 2)	
-		{
-			//wait
-		}
-		std::cout << "Caching and Loading Complete\n";
-
-		m_states.emplace_back(std::move(state));
-		m_states.emplace_back(std::make_unique<Menustate>(*this));
-	});
-	jobSystem.schedule(loadGame, false);
 
 	// Needed for setup
 	m_context = new bs::Context();

@@ -10,10 +10,10 @@
 
 #include <atomic>
 
-class GameState : public Basestate
+class WarAnalyzeState : public Basestate
 {
 public:
-    GameState(Application& app);
+    WarAnalyzeState(Application& app);
 
 	//Add an object to the gamestate list
 	void createObject(bs::Transform& t, const std::string& name);
@@ -28,7 +28,7 @@ public:
 
 	PlayerController& getPlayer() override;
 
-    ~GameState() override;
+    ~WarAnalyzeState() override;
 protected:
 
 

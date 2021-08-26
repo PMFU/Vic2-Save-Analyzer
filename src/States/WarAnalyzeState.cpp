@@ -1,7 +1,7 @@
-#include "Gamestate.h"
+#include "WarAnalyzeState.h"
 
 
-GameState::GameState(Application& app)	:	Basestate(app)
+WarAnalyzeState::WarAnalyzeState(Application& app)	:	Basestate(app)
 {
 	bs::Transform t;
 	bs::GameObject gobj(t);
@@ -14,13 +14,13 @@ GameState::GameState(Application& app)	:	Basestate(app)
 	
 }
 
-GameState::~GameState()
+WarAnalyzeState::~WarAnalyzeState()
 {
 	//Wait for job to finish to prevent errors
 	while(jobSystem.backgroundJobs() != 0)	{	}
 }
 
-bool GameState::input(float dt)
+bool WarAnalyzeState::input(float dt)
 {
 	bs::asset_manager->loaded = true;
 
@@ -33,7 +33,7 @@ bool GameState::input(float dt)
 	return false;
 }
 
-void GameState::update(float dt)
+void WarAnalyzeState::update(float dt)
 {
 	void* data[] = { &dt, &m_player, &m_gameObjects };
 
@@ -69,12 +69,12 @@ void GameState::update(float dt)
 	updateGUI();
 }
 
-void GameState::lateUpdate(Camera* cam)
+void WarAnalyzeState::lateUpdate(Camera* cam)
 {
 
 }
 
-void GameState::updateGUI() 
+void WarAnalyzeState::updateGUI() 
 {
 	static bool showwindow = false;
 	static bool consolewindow = false;
@@ -86,9 +86,10 @@ void GameState::updateGUI()
 
 	constexpr auto windowflag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;// | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
 
+
 }
 
-void GameState::render(Renderer* renderer)
+void WarAnalyzeState::render(Renderer* renderer)
 {	
 	for (auto& obj : m_gameObjects)
 	{
@@ -97,13 +98,13 @@ void GameState::render(Renderer* renderer)
 	}
 }
 
-void GameState::createObject(bs::Transform& t, const std::string& name) 
+void WarAnalyzeState::createObject(bs::Transform& t, const std::string& name) 
 {
 	bs::GameObject gObj(t, name);
 	m_gameObjects.emplace_back(gObj);
 }
 
-void GameState::removeObject(const std::string& name) 
+void WarAnalyzeState::removeObject(const std::string& name) 
 {
 	bool remove = false;
 	m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(), [&name, &remove](const bs::GameObject& elem) -> bool
@@ -122,7 +123,7 @@ void GameState::removeObject(const std::string& name)
 	}
 }
 
-PlayerController& GameState::getPlayer() 
+PlayerController& WarAnalyzeState::getPlayer() 
 {
 	return m_player;
 }
