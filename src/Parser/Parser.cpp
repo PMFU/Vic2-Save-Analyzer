@@ -91,6 +91,8 @@ Savegame loadSavegame(const std::string& filepath)
 				}
 				
 			}
+			
+			lines.emplace_back(buffer);
 
 			info.emplace_back(lines);
 		}
@@ -203,37 +205,60 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 	int scopeDepth = 0; //Everytime there is '{', increment, and when '}', decrement
 	int bracketDepth = 0; //Everytime there is '[', increment, and when ']', decrement
 	int parenthesisDepth = 0; //Everytime there is '(', increment, and when ')', decrement
-	bool strLiteral = false; //Toggle when '"' is encountered, when true, directly parse everything into the lvalue operand
+	//bool strLiteral = false; //Toggle when '"' is encountered, when true, directly parse everything into the lvalue operand
 	bool isLeftOperand = true; 
 
 	bool setBattle = false;
 
-	std::string currentSection = "";
-
 	std::vector<std::string> battleStream;
-	std::string stringliteral = "";
+
+	std::string stringliteral;
+	std::string currentSection;
 
 
 	for(auto index = 0; index < tokenStream.size(); ++index)
 	{
-		const auto& token = tokenStream[index];
-		if(token.empty())
+		const auto& tkn = tokenStream[index];
+		if(tkn.empty())
 		{
 			continue;
 		}
 
+		std::string token = tkn;
+
+		if(tkn.at(0) == '\t')
+		{
+			auto x = tkn.find_first_not_of('\t');
+			if(x == std::string::npos) { continue; }
+
+			token = tkn.substr(x, tkn.length() - x);
+		}
+		else
+		{
+			token = tkn;
+		}
+
 		if(isToken(token.at(0)))
 		{
-			if(bracketDepth >= 3)
+			if(bracketDepth > 2)
 			{
-				battleStream.emplace_back(token);
+				//battleStream.emplace_back(token);
 			}
 
 			switch (token.at(0))
 			{	//Begin Switch
 				case '"':
 				{
-					strLiteral = !strLiteral;
+					index += 1;
+
+					while(tokenStream[index].at(0) != '"')
+					{
+						stringliteral.append(tokenStream[index]);
+						index += 1;
+					}
+
+					//index += 1;
+
 					break;
 				}
 				case '(':
@@ -272,7 +297,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				{
 					isLeftOperand = true;
 
-					if(bracketDepth >= 3)
+					if(bracketDepth > 2)
 					{
 						break;
 					}
@@ -286,6 +311,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 					if(currentSection == casus_belli) { w.wargoal = casus_belli; break; }
 
 					currentSection.clear();
+					stringliteral.clear();
 
 					break;
 				}
@@ -303,9 +329,9 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 		}
 		else
 		{
-			if(bracketDepth >= 3)
+			if(bracketDepth > 2)
 			{
-				battleStream.emplace_back(token);
+				//battleStream.emplace_back(token);
 				continue;
 			}
 
@@ -321,8 +347,6 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				battleStream.clear();
 			}
 
-			if(strLiteral) { stringliteral.append(token); continue; }
-
 			if(isLeftOperand)
 			{
 				if(token == name) { currentSection = name; continue; }
@@ -333,10 +357,19 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				if(token == original_attacker) { currentSection = original_attacker; continue; }
 				if(token == casus_belli) { currentSection = casus_belli; continue; }
 
-				currentSection.clear();
+				std::cout << "THIS IS THE TOKEN: |" << token << "| \n";
 			}
 		}
 	}
+
+	std::cout << "Here is the token stream for a war:\n";
+
+	for(const auto& i : tokenStream)
+	{
+		std::cout << i << '|';
+	}
+
+	std::cout << "End token stream\n\n";
 
 	return w;
 }
