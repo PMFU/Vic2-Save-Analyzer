@@ -75,6 +75,7 @@ Savegame loadSavegame(const std::string& filepath)
 			std::vector<std::string> lines;
 			std::getline(stream, buffer, '\n');
 			buffer.push_back('\n');
+			buffer.push_back('\0');
 
 			while((!lineContainsWarStart(buffer)) && (buffer != "}\n"))
 			{
@@ -83,10 +84,12 @@ Savegame loadSavegame(const std::string& filepath)
 				if(std::getline(stream, buffer, '\n'))
 				{
 					buffer.push_back('\n');
+					buffer.push_back('\0');
 				}
 				else
 				{
 					buffer.push_back('\n');
+					buffer.push_back('\0');
 					break;
 				}
 				

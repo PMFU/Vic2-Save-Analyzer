@@ -87,19 +87,239 @@ void WarAnalyzeState::updateGUI()
 	static std::vector<int> imgIDs = { 1 }; 
 	static bool loaded = false;
 
+	static std::string selectedWarName;
+	static int selectedBattle = 0;
+
 	auto& io = ImGui::GetIO();
 
 	constexpr auto windowflag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;// | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
+
+	auto topmenu = [&]()
+	{
+		//ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, ImVec2(0.0f, 8.0f));
+		if(ImGui::BeginChild("TopBar", ImVec2(0.0f, 100.0f), false, windowflag))
+		{
+			if(ImGui::Button("Save Select"))
+			{
+				indexTab = 1;
+			}
+			ImGui::SameLine();
+
+			if(ImGui::Button("Wars List") && loaded)
+			{
+				indexTab = 2;
+			}
+			ImGui::SameLine();
+
+			if(ImGui::Button("War") && loaded)
+			{
+				indexTab = 3;
+			}
+			ImGui::SameLine();
+
+			if(ImGui::Button("Battle") && loaded)
+			{
+				indexTab = 4;
+			}
+		}
+		
+		ImGui::EndChild();
+		//ImGui::PopStyleVar();
+	};
+
+	auto saveselect = [&]()
+	{
+		if(ImGui::BeginChild("SaveSelect", {0.0f, 0.0f}, false, windowflag))
+		{
+			if(ImGui::Button("Load"))
+			{
+				save = loadSavegame("testdata/Testsave.v2");
+				loaded = true;
+			}
+		}
+		ImGui::EndChild();
+	};
+
+	auto warslist = [&]()
+	{
+		if(ImGui::BeginChild("WarList", {0.0f, 0.0f}, false, windowflag))
+		{
+			const auto& wars = save.getWars();
+
+			if(ImGui::BeginTable("WarListTable", 4))
+			{
+				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Start", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("End", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Result", ImGuiTableColumnFlags_None);
+				ImGui::TableHeadersRow();
+
+				for(const auto& [name, war] : wars)
+				{
+					ImGui::TableNextRow();
+                    for (int column = 0; column < 4; column++)
+                    {
+                        ImGui::TableSetColumnIndex(column);
+
+						switch (column)
+						{
+						case 0:
+						{
+							ImGui::Text(name.c_str());
+							break;
+						}
+						case 1:
+						{
+							ImGui::Text(war.start.getText().c_str());
+							break;
+						}
+						case 2:
+						{
+							ImGui::Text("End");
+							break;
+						}
+						case 3:
+						{
+							ImGui::Text(war.doesAttackerWin ? "Victory" : "Defeat");
+							break;
+						}	
+						default:
+							break;
+						}
+                    }
+				}
+				
+
+				ImGui::EndTable();
+			}
+		}
+		ImGui::EndChild();
+	};
+
+	auto war = [&]()
+	{
+		const float fifthwidth = io.DisplaySize.x * 0.2f;
+
+		if(ImGui::BeginChild("War", {0.0f, 0.0f}, false, windowflag))
+		{
+			ImGui::BeginGroup();	//Left Side Menu
+			ImGui::PushItemWidth(fifthwidth);
+
+			ImGui::Text("War Menu");
+
+			
+			ImGui::PopItemWidth();
+			ImGui::EndGroup();
+			ImGui::SameLine();
+
+			ImGui::BeginGroup();	//Middle Menu
+
+			const auto& wars = save.getWars();
+			ImGui::PushItemWidth(fifthwidth * 3); //make sure this is adjusted by the frame size
+
+			if(ImGui::BeginTable("WarListTable", 4))
+			{
+				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Start", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("End", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Result", ImGuiTableColumnFlags_None);
+				ImGui::TableHeadersRow();
+
+				for(const auto& [name, war] : wars)
+				{
+					ImGui::TableNextRow();
+                    for (int column = 0; column < 4; column++)
+                    {
+                        ImGui::TableSetColumnIndex(column);
+
+						switch (column)
+						{
+						case 1:
+						{
+							ImGui::Text(name.c_str());
+							break;
+						}
+						case 2:
+						{
+							ImGui::Text(war.start.getText().c_str());
+							break;
+						}
+						case 3:
+						{
+							ImGui::Text("End");
+							break;
+						}
+						case 4:
+						{
+							ImGui::Text(war.doesAttackerWin ? "Victory" : "Defeat");
+							break;
+						}	
+						default:
+							break;
+						}
+                    }
+				}
+				
+
+				ImGui::EndTable();
+			}
+
+			ImGui::EndGroup();
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+			
+			ImGui::BeginGroup();	//Right Side Menu
+			ImGui::PushItemWidth(fifthwidth);
+			
+
+			ImGui::PopItemWidth();
+			ImGui::EndGroup();
+			ImGui::SameLine();
+		}
+		ImGui::EndChild();
+	};
+
+	auto battle = [&]()
+	{
+		if(ImGui::BeginChild("Battle", {0.0f, 0.0f}, false, windowflag))
+		{
+
+		}
+		ImGui::EndChild();
+	};
 
 	if(ImGui::Begin("Big Screen", nullptr, windowflag))
 	{
 		ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
 		ImGui::SetWindowSize(io.DisplaySize);
 
-		if(ImGui::Button("Load"))
+		topmenu();
+
+		ImGui::Separator();
+		
+
+		switch (indexTab)
 		{
-			save = loadSavegame("testdata/test.v2");
-			loaded = true;
+		case 1:
+			saveselect();
+			break;
+		
+		case 2:
+			warslist();
+			break;
+
+		case 3:
+			war();
+			break;
+
+		case 4:
+			battle();
+			break;
+		
+		default:
+			break;
 		}
 		
 		ImGui::Separator();
@@ -111,10 +331,10 @@ void WarAnalyzeState::updateGUI()
 
 			for(const auto& [name, war] : wars)
 			{
-				ImGui::Text("Name: %s, %f",//Winner: %s, Battles: %zu", 
-					name.c_str(), 1.0f);
-					//(war.doesAttackerWin ? war.attackers.at(0).c_str() : war.defenders.at(0).c_str()),
-					//war.battles.size());
+				ImGui::Text("Name: %s, Winner: %s, Battles: %zu", 
+					name.c_str(),
+					(war.doesAttackerWin ? war.attackers.at(0).c_str() : war.defenders.at(0).c_str()),
+					war.battles.size());
 			}
 		}
 	}

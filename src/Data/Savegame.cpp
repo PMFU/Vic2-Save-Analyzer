@@ -10,7 +10,7 @@ Savegame::Savegame()
 	w.name = "Testing war";
 	w.wargoal = "There is none, this is a test";
 
-	m_warsmap.insert(std::pair(w.name, w));
+	//m_warsmap.insert(std::pair(w.name, w));
 }
 
 Savegame::~Savegame()
