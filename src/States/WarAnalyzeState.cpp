@@ -250,6 +250,14 @@ void WarAnalyzeState::updateGUI()
 				for(const auto& battle : war.battles)
 				{
 					ImGui::TableNextRow();
+
+					ImGui::TableSetColumnIndex(0);
+					ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap;
+					bool selected = selectedBattle == battle.location;
+					if (ImGui::Selectable(battle.name.c_str(), selected, selectable_flags, ImVec2(0.0f, 0.0f)))
+                    {
+						selectedBattle = battle.location;
+					}
                     for (int column = 0; column < 6; column++)
                     {
                         ImGui::TableSetColumnIndex(column);
@@ -258,7 +266,7 @@ void WarAnalyzeState::updateGUI()
 						{
 						case 0:
 						{
-							ImGui::Text(battle.name.c_str());
+							//ImGui::Text(battle.name.c_str());
 							break;
 						}
 						case 1:
