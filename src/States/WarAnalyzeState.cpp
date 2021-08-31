@@ -203,6 +203,13 @@ void WarAnalyzeState::updateGUI()
 
 		if(ImGui::BeginChild("War", {0.0f, 0.0f}, false, windowflag))
 		{
+			const auto& wars = save.getWars();
+			if(selectedWarName.empty())	//If there is no selection
+			{
+				ImGui::EndChild();
+				return;
+			}
+
 			ImGui::BeginGroup();	//Left Side Menu
 			ImGui::PushItemWidth(fifthwidth);
 
@@ -215,43 +222,56 @@ void WarAnalyzeState::updateGUI()
 
 			ImGui::BeginGroup();	//Middle Menu
 
-			const auto& wars = save.getWars();
+			const auto& war = wars.at(selectedWarName);
+
 			ImGui::PushItemWidth(fifthwidth * 3); //make sure this is adjusted by the frame size
 
-			if(ImGui::BeginTable("WarListTable", 4))
+			if(ImGui::BeginTable("BattleListTable", 6))
 			{
 				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Start", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("End", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Location", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Casualties", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Result", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
-				for(const auto& [name, war] : wars)
+				for(const auto& battle : war.battles)
 				{
 					ImGui::TableNextRow();
-                    for (int column = 0; column < 4; column++)
+                    for (int column = 0; column < 6; column++)
                     {
                         ImGui::TableSetColumnIndex(column);
 
 						switch (column)
 						{
-						case 1:
+						case 0:
 						{
-							ImGui::Text(name.c_str());
+							ImGui::Text(battle.name.c_str());
 							break;
 						}
-						case 2:
+						case 1:
 						{
 							ImGui::Text(war.start.getText().c_str());
 							break;
 						}
-						case 3:
+						case 2:
 						{
 							ImGui::Text("End");
 							break;
 						}
+						case 3:
+						{
+							ImGui::Text("%h", battle.location);
+							break;
+						}
 						case 4:
+						{
+							ImGui::Text("%zs", battle.atklosses + battle.deflosses);
+							break;
+						}
+						case 5:
 						{
 							ImGui::Text(war.doesAttackerWin ? "Victory" : "Defeat");
 							break;
@@ -261,7 +281,6 @@ void WarAnalyzeState::updateGUI()
 						}
                     }
 				}
-				
 
 				ImGui::EndTable();
 			}
