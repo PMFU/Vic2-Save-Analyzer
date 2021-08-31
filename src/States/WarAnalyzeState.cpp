@@ -248,16 +248,17 @@ void WarAnalyzeState::updateGUI()
 				ImGui::TableSetupColumn("Result", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
+				int battleIndex = 0;
 				for(const auto& battle : war.battles)
 				{
 					ImGui::TableNextRow();
 
 					ImGui::TableSetColumnIndex(0);
 					ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap;
-					bool selected = selectedBattle == battle.location;
+					bool selected = selectedBattle == battleIndex;
 					if (ImGui::Selectable(battle.name.c_str(), selected, selectable_flags, ImVec2(0.0f, 0.0f)))
                     {
-						selectedBattle = battle.location;
+						selectedBattle = battleIndex;
 					}
                     for (int column = 0; column < 6; column++)
                     {
@@ -299,6 +300,8 @@ void WarAnalyzeState::updateGUI()
 							break;
 						}
                     }
+
+					battleIndex += 1;
 				}
 
 				ImGui::EndTable();
