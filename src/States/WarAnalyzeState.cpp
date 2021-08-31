@@ -133,8 +133,8 @@ void WarAnalyzeState::updateGUI()
 		{
 			if(ImGui::Button("Load"))
 			{
-				save = loadSavegame("testdata/test.v2");
-				// save = loadSavegame("testdata/Testsave.v2");
+				// save = loadSavegame("testdata/test.v2");
+				save = loadSavegame("testdata/Testsave.v2");
 				loaded = true;
 			}
 		}
@@ -146,8 +146,9 @@ void WarAnalyzeState::updateGUI()
 		if(ImGui::BeginChild("WarList", {0.0f, 0.0f}, false, windowflag))
 		{
 			const auto& wars = save.getWars();
+			constexpr auto tableflags = ImGuiTableFlags_Reorderable | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable;
 
-			if(ImGui::BeginTable("WarListTable", 4))
+			if(ImGui::BeginTable("WarListTable", 4, tableflags))
 			{
 				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
@@ -159,6 +160,14 @@ void WarAnalyzeState::updateGUI()
 				for(const auto& [name, war] : wars)
 				{
 					ImGui::TableNextRow();
+
+					ImGui::TableSetColumnIndex(0);
+					ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap;
+					bool selected = selectedWarName == name;
+					if (ImGui::Selectable(name.c_str(), selected, selectable_flags, ImVec2(0.0f, 0.0f)))
+                    {
+						selectedWarName = name;
+					}
                     for (int column = 0; column < 4; column++)
                     {
                         ImGui::TableSetColumnIndex(column);
@@ -167,7 +176,7 @@ void WarAnalyzeState::updateGUI()
 						{
 						case 0:
 						{
-							ImGui::Text(name.c_str());
+							//ImGui::Text(name.c_str());
 							break;
 						}
 						case 1:
@@ -227,7 +236,7 @@ void WarAnalyzeState::updateGUI()
 
 			ImGui::PushItemWidth(fifthwidth * 3); //make sure this is adjusted by the frame size
 
-			if(ImGui::BeginTable("BattleListTable", 6))
+			if(ImGui::BeginTable("BattleListTable", 6, 0, ImVec2(fifthwidth * 3, 0.0f)))
 			{
 				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
@@ -269,7 +278,7 @@ void WarAnalyzeState::updateGUI()
 						}
 						case 4:
 						{
-							ImGui::Text("%zs", battle.atklosses + battle.deflosses);
+							ImGui::Text("%lu", battle.atklosses + battle.deflosses);
 							break;
 						}
 						case 5:
