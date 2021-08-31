@@ -188,13 +188,6 @@ std::vector<std::string> tokenizeLine(const std::string& line)
 
 War convertToWar(const std::vector<std::string>& tokenStream)
 {
-	std::cout << "WAR TOKEN STREAM:\n";
-	for(const auto& t : tokenStream)
-	{
-		std::cout << t << '|';
-	}
-	std::cout << "\nEND WAR TOKEN STREAM\n\n";
-
 	War w;
 
 	//All the strings for the actions/commands/keywords relevant
@@ -258,6 +251,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 			{	//Begin Switch
 				case '"':
 				{
+					stringliteral.clear();
 					index += 1;
 
 					while(tokenStream[index].at(0) != '"')
@@ -265,12 +259,17 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 						//Add the token to the battle stream if in it
 						if(isBattle)
 						{
-							battleStream.emplace_back(token);
+							battleStream.emplace_back(tokenStream[index]);
 						}
 
 						//Add the token to the string literal string
 						stringliteral.append(tokenStream[index]);
 						index += 1;
+					}
+
+					if(isBattle)
+					{
+						battleStream.emplace_back("\"");
 					}
 
 					break;
@@ -301,14 +300,19 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 					break;
 				}
 				case '}':
-				{
+				{	
+					scopeDepth -= 1;
+
 					//End the battle token stream
-					if(isBattle && (curBattleScope < scopeDepth))
+					if((curBattleScope - 1) == scopeDepth)
 					{
+						std::cout << "End of Battle\n";
 						isBattle = false;
+						w.battles.emplace_back(convertToBattle(battleStream));
+
+						battleStream.clear();
 					}
 
-					scopeDepth -= 1;
 					break;
 				}
 
@@ -355,18 +359,6 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				continue;
 			}
 
-			if(!battleStream.empty())
-			{
-				/*if(battleStream.back() == "}")
-				{
-					battleStream.pop_back();
-				}*/
-
-				w.battles.emplace_back(convertToBattle(battleStream));
-
-				battleStream.clear();
-			}
-
 			if(isLeftOperand)
 			{
 				if(token == name) { currentSection = name; continue; }
@@ -377,7 +369,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				if(token == original_attacker) { currentSection = original_attacker; continue; }
 				if(token == casus_belli) { currentSection = casus_belli; continue; }
 
-				//std::cout << "THIS IS THE TOKEN: |" << token << "| \n";
+				std::cout << "THIS IS THE TOKEN: |" << token << "| \n";
 			}
 		}
 	}
@@ -441,6 +433,7 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 			{	//Begin Switch
 				case '"':
 				{
+					stringliteral.clear();
 					index += 1;
 
 					while(tokenStream[index].at(0) != '"')
@@ -496,17 +489,23 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 
 					if(currentSection == name) { b.name = stringliteral; break; }
 					if(currentSection == battle) { break; }
-					if(currentSection == result) { (stringliteral == "yes") ? b.doesAttackerWin = true : b.doesAttackerWin = false; break; }
 					if(currentSection == attacker) { sideStatus = 1; break; }
 					if(currentSection == defender) { sideStatus = 2; break; }
 					if(currentSection == country) { (sideStatus > 1) ? b.countryDEF = stringliteral: b.countryATK = stringliteral; break; }
 					if(currentSection == leader) { (sideStatus > 1) ? b.leaderDEF = stringliteral: b.leaderATK = stringliteral; break; }
 					
+					std::cout << "THE CURRENT SELECTION: |" << currentSection << "|\n";
+					std::cout << "THE STRING LITERAL: |" << stringliteral << "|\n";
+
+					if(currentSection == result) { (stringliteral == "yes") ? b.doesAttackerWin = true : b.doesAttackerWin = false; break; }
+
 					if(currentSection == losses) { (sideStatus > 1) ? b.deflosses = std::stoi(stringliteral): b.atklosses = std::stoi(stringliteral); break; }
 					if(currentSection == location) { b.location = std::stoi(stringliteral); break; }
 
 					if(currentSection == "unit") 
 					{
+						std::cout << "THE UNIT TYPE: |" << unitname << "|\n";
+						
 						Unit u;
 						u.name = unitname;
 						u.size = std::stoi(stringliteral);
@@ -545,6 +544,11 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 
 				currentSection = "unit";
 				unitname = token;
+			}
+			else
+			{
+				stringliteral.clear();
+				stringliteral = token;
 			}
 		}
 	}
