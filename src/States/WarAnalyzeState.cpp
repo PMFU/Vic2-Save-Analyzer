@@ -88,7 +88,7 @@ void WarAnalyzeState::updateGUI()
 	static bool loaded = false;
 
 	static std::string selectedWarName;
-	static int selectedBattle = 0;
+	static int selectedBattle = -1;
 
 	auto& io = ImGui::GetIO();
 
@@ -167,6 +167,7 @@ void WarAnalyzeState::updateGUI()
 					if (ImGui::Selectable(name.c_str(), selected, selectable_flags, ImVec2(0.0f, 0.0f)))
                     {
 						selectedWarName = name;
+						selectedBattle = -1;
 					}
                     for (int column = 0; column < 4; column++)
                     {
@@ -320,9 +321,52 @@ void WarAnalyzeState::updateGUI()
 
 	auto battle = [&]()
 	{
+		
 		if(ImGui::BeginChild("Battle", {0.0f, 0.0f}, false, windowflag))
 		{
+			if(selectedBattle < 0)
+			{
+				ImGui::EndChild();
+				return;
+			}
 
+			const auto& battle = save.getWars().at(selectedWarName).battles[selectedBattle];
+
+			ImGui::BeginGroup();
+
+			ImGui::Text("Attacker");
+
+			ImGui::Text("Country: %s", battle.countryATK);
+			ImGui::Text("Units:");
+			
+			for(const auto& unit : battle.atkUnits)
+			{
+				const auto unitsize = std::to_string(unit.size);
+				ImGui::Text("\t%s : %s", unit.name.c_str(), unitsize.c_str());
+			}
+
+			const auto atkLosses = std::to_string(battle.atklosses);
+			ImGui::Text("Losses : %s", atkLosses);
+
+			ImGui::EndGroup();
+			ImGui::SameLine();
+			ImGui::BeginGroup();
+
+			ImGui::Text("Defender");
+
+			ImGui::Text("Country: %s", battle.countryDEF);
+			ImGui::Text("Units:");
+			
+			for(const auto& unit : battle.defUnits)
+			{
+				const auto unitsize = std::to_string(unit.size);
+				ImGui::Text("\t%s : %s", unit.name.c_str(), unitsize.c_str());
+			}
+
+			const std::string defLosses = std::to_string(battle.deflosses);
+			ImGui::Text("Losses : %s", defLosses.c_str());
+
+			ImGui::EndGroup();
 		}
 		ImGui::EndChild();
 	};
