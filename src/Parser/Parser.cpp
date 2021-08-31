@@ -75,7 +75,7 @@ Savegame loadSavegame(const std::string& filepath)
 			std::vector<std::string> lines;
 			std::getline(stream, buffer, '\n');
 			buffer.push_back('\n');
-			buffer.push_back('\0');
+			//buffer.push_back('\0');
 
 			while((!lineContainsWarStart(buffer)) && (buffer != "}\n"))
 			{
@@ -84,7 +84,7 @@ Savegame loadSavegame(const std::string& filepath)
 				if(std::getline(stream, buffer, '\n'))
 				{
 					buffer.push_back('\n');
-					buffer.push_back('\0');
+					//buffer.push_back('\0');
 				}
 				else
 				{
@@ -183,13 +183,18 @@ std::vector<std::string> tokenizeLine(const std::string& line)
 		curToken.clear();
 	}
 
-	// /std::cout << "Found " << tokens.size() << " tokens.\n";
-
 	return tokens;
 }
 
 War convertToWar(const std::vector<std::string>& tokenStream)
 {
+	std::cout << "WAR TOKEN STREAM:\n";
+	for(const auto& t : tokenStream)
+	{
+		std::cout << t << '|';
+	}
+	std::cout << "\nEND WAR TOKEN STREAM\n\n";
+
 	War w;
 
 	//All the strings for the actions/commands/keywords relevant
@@ -208,10 +213,11 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 	int scopeDepth = 0; //Everytime there is '{', increment, and when '}', decrement
 	int bracketDepth = 0; //Everytime there is '[', increment, and when ']', decrement
 	int parenthesisDepth = 0; //Everytime there is '(', increment, and when ')', decrement
-	//bool strLiteral = false; //Toggle when '"' is encountered, when true, directly parse everything into the lvalue operand
+
 	bool isLeftOperand = true; 
 
-	bool setBattle = false;
+	bool isBattle = false;
+	int curBattleScope = 9999;
 
 	std::vector<std::string> battleStream;
 
@@ -227,7 +233,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 			continue;
 		}
 
-		std::string token = tkn;
+		std::string token;
 
 		if(tkn.at(0) == '\t')
 		{
@@ -243,9 +249,9 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 
 		if(isToken(token.at(0)))
 		{
-			if(bracketDepth > 2)
+			if(isBattle)
 			{
-				//battleStream.emplace_back(token);
+				battleStream.emplace_back(token);
 			}
 
 			switch (token.at(0))
@@ -256,11 +262,16 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 
 					while(tokenStream[index].at(0) != '"')
 					{
+						//Add the token to the battle stream if in it
+						if(isBattle)
+						{
+							battleStream.emplace_back(token);
+						}
+
+						//Add the token to the string literal string
 						stringliteral.append(tokenStream[index]);
 						index += 1;
 					}
-
-					//index += 1;
 
 					break;
 				}
@@ -291,6 +302,12 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				}
 				case '}':
 				{
+					//End the battle token stream
+					if(isBattle && (curBattleScope < scopeDepth))
+					{
+						isBattle = false;
+					}
+
 					scopeDepth -= 1;
 					break;
 				}
@@ -300,13 +317,13 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				{
 					isLeftOperand = true;
 
-					if(bracketDepth > 2)
+					if(isBattle)
 					{
 						break;
 					}
 
 					if(currentSection == name) { w.name = stringliteral; break; }
-					if(currentSection == battle) { break; }
+					if(currentSection == battle) { isBattle = true; curBattleScope = scopeDepth + 1; break; }
 					if(currentSection == history) { /*currentSection = history;*/ break; }
 					if(currentSection == original_wargoal) { /*currentSection = original_wargoal;*/ break; }
 					if(currentSection == original_defender) { w.defenders.emplace_back(original_defender); break; }
@@ -332,20 +349,20 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 		}
 		else
 		{
-			if(bracketDepth > 2)
+			if(isBattle)
 			{
-				//battleStream.emplace_back(token);
+				battleStream.emplace_back(token);
 				continue;
 			}
 
-			if(battleStream.size() > 10)
+			if(!battleStream.empty())
 			{
-				if(battleStream.back() == "}")
+				/*if(battleStream.back() == "}")
 				{
 					battleStream.pop_back();
-				}
+				}*/
 
-				//w.battles.emplace_back(convertToBattle(battleStream));
+				w.battles.emplace_back(convertToBattle(battleStream));
 
 				battleStream.clear();
 			}
@@ -360,19 +377,10 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				if(token == original_attacker) { currentSection = original_attacker; continue; }
 				if(token == casus_belli) { currentSection = casus_belli; continue; }
 
-				std::cout << "THIS IS THE TOKEN: |" << token << "| \n";
+				//std::cout << "THIS IS THE TOKEN: |" << token << "| \n";
 			}
 		}
 	}
-
-	std::cout << "Here is the token stream for a war:\n";
-
-	for(const auto& i : tokenStream)
-	{
-		std::cout << i << '|';
-	}
-
-	std::cout << "End token stream\n\n";
 
 	return w;
 }
@@ -384,7 +392,7 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 	std::cout << "BATTLE TOKEN STREAM:\n";
 	for(const auto& t : tokenStream)
 	{
-		std::cout << t;
+		std::cout << t << '|';
 	}
 	std::cout << "\nEND BATTLE TOKEN STREAM\n\n";
 
@@ -403,20 +411,29 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 	int scopeDepth = 0; //Everytime there is '{', increment, and when '}', decrement
 	int bracketDepth = 0; //Everytime there is '[', increment, and when ']', decrement
 	int parenthesisDepth = 0; //Everytime there is '(', increment, and when ')', decrement
-	bool strLiteral = false; //Toggle when '"' is encountered, when true, directly parse everything into the lvalue operand
+
 	bool isLeftOperand = true; 
 
 	bool isActualBattle = false;
 	
 	int sideStatus = 0; //0 is none, 1 is atk, 2 is def
 
-	std::string currentSection = "";
+	std::string currentSection;
 	std::string stringliteral;
 	std::string unitname;
+
+	currentSection.clear();
+	stringliteral.clear();
+	unitname.clear();
 
 	for(auto index = 0; index < tokenStream.size(); ++index)
 	{
 		const auto& token = tokenStream[index];
+
+		if(token.empty())
+		{
+			continue;
+		}
 
 		if(isToken(token.at(0)))
 		{
@@ -424,14 +441,13 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 			{	//Begin Switch
 				case '"':
 				{
-					if(strLiteral)
+					index += 1;
+
+					while(tokenStream[index].at(0) != '"')
 					{
-						strLiteral = false;
-					}
-					else
-					{
-						stringliteral.clear();
-						strLiteral = true;
+						//Add the token to the string literal string
+						stringliteral.append(tokenStream[index]);
+						index += 1;
 					}
 
 					break;
@@ -472,16 +488,23 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 				{
 					isLeftOperand = true;
 
+					if(stringliteral.empty())
+					{
+						std::cout << "String Literal is empty\n";
+						break;
+					}
+
 					if(currentSection == name) { b.name = stringliteral; break; }
 					if(currentSection == battle) { break; }
-					if(currentSection == location) { b.location = std::stoi(stringliteral); break; }
 					if(currentSection == result) { (stringliteral == "yes") ? b.doesAttackerWin = true : b.doesAttackerWin = false; break; }
 					if(currentSection == attacker) { sideStatus = 1; break; }
 					if(currentSection == defender) { sideStatus = 2; break; }
 					if(currentSection == country) { (sideStatus > 1) ? b.countryDEF = stringliteral: b.countryATK = stringliteral; break; }
 					if(currentSection == leader) { (sideStatus > 1) ? b.leaderDEF = stringliteral: b.leaderATK = stringliteral; break; }
-					if(currentSection == losses) { (sideStatus > 1) ? b.deflosses = std::stoi(stringliteral): b.atklosses = std::stoi(stringliteral); break; }
 					
+					if(currentSection == losses) { (sideStatus > 1) ? b.deflosses = std::stoi(stringliteral): b.atklosses = std::stoi(stringliteral); break; }
+					if(currentSection == location) { b.location = std::stoi(stringliteral); break; }
+
 					if(currentSection == "unit") 
 					{
 						Unit u;
@@ -508,9 +531,6 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 		}
 		else
 		{
-
-			if(strLiteral) { stringliteral.append(token); continue; }
-
 			if(isLeftOperand)
 			{
 				if(token == name) { currentSection = name; continue; }
@@ -530,4 +550,9 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 	}
 
 	return b;
+}
+
+void parseWarHistory(War& war, const std::vector<std::string>& tokenStream)
+{
+
 }

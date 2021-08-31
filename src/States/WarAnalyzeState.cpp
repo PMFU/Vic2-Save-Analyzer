@@ -133,7 +133,8 @@ void WarAnalyzeState::updateGUI()
 		{
 			if(ImGui::Button("Load"))
 			{
-				save = loadSavegame("testdata/Testsave.v2");
+				save = loadSavegame("testdata/test.v2");
+				// save = loadSavegame("testdata/Testsave.v2");
 				loaded = true;
 			}
 		}
@@ -348,13 +349,13 @@ void WarAnalyzeState::updateGUI()
 			const auto& wars = save.getWars();
 			ImGui::Text("Wars: ");
 
-			for(const auto& [name, war] : wars)
+			/*for(const auto& [name, war] : wars)
 			{
 				ImGui::Text("Name: %s, Winner: %s, Battles: %zu", 
 					name.c_str(),
 					(war.doesAttackerWin ? war.attackers.at(0).c_str() : war.defenders.at(0).c_str()),
 					war.battles.size());
-			}
+			}*/
 		}
 	}
 	ImGui::End();
