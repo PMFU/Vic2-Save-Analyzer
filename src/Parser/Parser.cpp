@@ -308,8 +308,15 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 					{
 						std::cout << "End of Battle\n";
 						isBattle = false;
-						w.battles.emplace_back(convertToBattle(battleStream));
+						curBattleScope = 9999;
 
+						if(battleStream.at(0) != battle)
+						{
+							battleStream.clear();
+							break;
+						}
+
+						w.battles.emplace_back(convertToBattle(battleStream));
 						battleStream.clear();
 					}
 
@@ -370,6 +377,8 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				if(token == casus_belli) { currentSection = casus_belli; continue; }
 
 				std::cout << "THIS IS THE TOKEN: |" << token << "| \n";
+
+				currentSection = token; 
 			}
 		}
 	}
