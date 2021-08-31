@@ -306,7 +306,6 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 					//End the battle token stream
 					if((curBattleScope - 1) == scopeDepth)
 					{
-						std::cout << "End of Battle\n";
 						isBattle = false;
 						curBattleScope = 9999;
 
@@ -376,7 +375,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				if(token == original_attacker) { currentSection = original_attacker; continue; }
 				if(token == casus_belli) { currentSection = casus_belli; continue; }
 
-				std::cout << "THIS IS THE TOKEN: |" << token << "| \n";
+				std::cout << "THIS IS THE UNPARSED TOKEN: |" << token << "| \n";
 
 				currentSection = token; 
 			}
@@ -390,12 +389,12 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 {
 	Battle b;
 
-	std::cout << "BATTLE TOKEN STREAM:\n";
+	/*std::cout << "BATTLE TOKEN STREAM:\n";
 	for(const auto& t : tokenStream)
 	{
 		std::cout << t << '|';
 	}
-	std::cout << "\nEND BATTLE TOKEN STREAM\n\n";
+	std::cout << "\nEND BATTLE TOKEN STREAM\n\n";*/
 
 	const std::string battle = "battle";
 	const std::string name = "name";
@@ -503,8 +502,9 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 					if(currentSection == country) { (sideStatus > 1) ? b.countryDEF = stringliteral: b.countryATK = stringliteral; break; }
 					if(currentSection == leader) { (sideStatus > 1) ? b.leaderDEF = stringliteral: b.leaderATK = stringliteral; break; }
 					
-					std::cout << "THE CURRENT SELECTION: |" << currentSection << "|\n";
-					std::cout << "THE STRING LITERAL: |" << stringliteral << "|\n";
+					//std::cout << "THE CURRENT SELECTION: |" << currentSection << "|\n";
+					//std::cout << "THE STRING LITERAL: |" << stringliteral << "|\n";
+					
 
 					if(currentSection == result) { (stringliteral == "yes") ? b.doesAttackerWin = true : b.doesAttackerWin = false; break; }
 
@@ -513,7 +513,7 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 
 					if(currentSection == "unit") 
 					{
-						std::cout << "THE UNIT TYPE: |" << unitname << "|\n";
+						//std::cout << "THE UNIT TYPE: |" << unitname << "|\n";
 						
 						Unit u;
 						u.name = unitname;
