@@ -2,9 +2,13 @@
 
 #include "../Data/Savegame.h"
 #include "../Parser/Parser.h"
+#include "../Parser/Filepicker.h"
+
+#include <fstream>
 
 WarAnalyzeState::WarAnalyzeState(Application& app)	:	Basestate(app)
 {
+	/*
 	bs::Transform t;
 	bs::GameObject gobj(t);
 
@@ -12,8 +16,7 @@ WarAnalyzeState::WarAnalyzeState(Application& app)	:	Basestate(app)
 	gobj.material.normal_id = 1;		//FOR TEXTURE MAPPING
 
 	gobj.model_id = "flatplane";
-	m_gameObjects.emplace_back(gobj);
-	
+	m_gameObjects.emplace_back(gobj);*/
 }
 
 WarAnalyzeState::~WarAnalyzeState()
@@ -30,7 +33,7 @@ bool WarAnalyzeState::input(float dt)
 	vInput = Input::getInput(dt);
 	auto& io = ImGui::GetIO();
 
-	m_player.getInput(vInput);
+	//m_player.getInput(vInput);
 
 	return false;
 }
@@ -65,7 +68,6 @@ void WarAnalyzeState::update(float dt)
 
 	/// Schedule the jobs
 	jobSystem.schedule(update);
-
 	jobSystem.wait();
 
 	updateGUI();
@@ -78,13 +80,9 @@ void WarAnalyzeState::lateUpdate(Camera* cam)
 
 void WarAnalyzeState::updateGUI() 
 {
-	static bool showwindow = false;
-	static bool consolewindow = false;
-
 	static Savegame save;
 
 	static uint8_t indexTab = 1;
-	static std::vector<int> imgIDs = { 1 }; 
 	static bool loaded = false;
 
 	static std::string selectedWarName;
@@ -96,7 +94,6 @@ void WarAnalyzeState::updateGUI()
 
 	auto topmenu = [&]()
 	{
-		//ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, ImVec2(0.0f, 8.0f));
 		if(ImGui::BeginChild("TopBar", ImVec2(0.0f, 100.0f), false, windowflag))
 		{
 			if(ImGui::Button("Save Select"))
@@ -124,18 +121,61 @@ void WarAnalyzeState::updateGUI()
 		}
 		
 		ImGui::EndChild();
-		//ImGui::PopStyleVar();
 	};
 
 	auto saveselect = [&]()
 	{
+		static std::string fileToLoad = "testdata/test.v2";
+		static std::string fileString;
+		static bool fromFilepicker = false;
+
 		if(ImGui::BeginChild("SaveSelect", {0.0f, 0.0f}, false, windowflag))
 		{
 			if(ImGui::Button("Load"))
 			{
-				// save = loadSavegame("testdata/test.v2");
-				save = loadSavegame("testdata/Testsave.v2");
-				loaded = true;
+				if(!fromFilepicker)
+				{
+					if(fileToLoad.empty())
+					{
+						std::cout << "No file given\n";
+					}
+					else
+					{
+						std::ifstream testfile(fileToLoad);
+						if(testfile.is_open())
+						{
+							std::cout << "File Exists. Loading now.\n";
+							save = loadSavegame(fileToLoad);
+							loaded = true;
+						}
+					}
+				}
+				else
+				{
+					if(!fileString.empty())
+					{
+						fromFilepicker = true;
+						save = loadSavegameFromString(fileString);
+					}
+					else
+					{
+						fromFilepicker = false;
+					}
+				}
+			}
+
+			ImGui::Button(fileToLoad.c_str()); ImGui::SameLine();
+			if(ImGui::SmallButton("..."))
+			{
+				fileString = openFilePickerFile();
+				if(!fileString.empty())
+				{
+					fromFilepicker = true;
+				}
+				else
+				{
+					fromFilepicker = false;
+				}
 			}
 		}
 		ImGui::EndChild();

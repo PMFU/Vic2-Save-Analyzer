@@ -63,7 +63,6 @@ Savegame loadSavegame(const std::string& filepath)
 	std::cout << "The stream has been loaded. There are " << stream.str().length() << " characters.\n";
 
 	Date d;
-
 	std::vector<std::vector<std::string>> info;
 
 	for(std::string buffer; std::getline(stream, buffer, '\n'); )
@@ -75,7 +74,6 @@ Savegame loadSavegame(const std::string& filepath)
 			std::vector<std::string> lines;
 			std::getline(stream, buffer, '\n');
 			buffer.push_back('\n');
-			//buffer.push_back('\0');
 
 			while((!lineContainsWarStart(buffer)) && (buffer != "}\n"))
 			{
@@ -84,24 +82,20 @@ Savegame loadSavegame(const std::string& filepath)
 				if(std::getline(stream, buffer, '\n'))
 				{
 					buffer.push_back('\n');
-					//buffer.push_back('\0');
 				}
 				else
 				{
 					buffer.push_back('\n');
 					buffer.push_back('\0');
 					break;
-				}
-				
+				}	
 			}
 			
 			lines.emplace_back(buffer);
-
 			info.emplace_back(lines);
 		}
 	}
 
-	
 	//This can be parallelized as long as the order for [warTokens] tokens is the same
 	std::vector<std::vector<std::string>> warsTokens;
 	for(const auto& wars : info)
@@ -115,7 +109,88 @@ Savegame loadSavegame(const std::string& filepath)
 			{
 				warTokensVec.emplace_back(tok);
 			}
+		}
+		
+		if(!warTokensVec.empty())
+		{
+			warsTokens.push_back(warTokensVec);
+			std::cout << "Made a war token list.\n";
+		}	
+	}
 
+	Savegame savegame;
+
+	for(const auto& wtoken : warsTokens)
+	{
+		if(wtoken.size() == 0)
+		{
+			continue;
+		}
+		else
+		{
+			savegame.addWar(convertToWar(wtoken));
+			std::cout << "Made a war.\n";
+		}
+	}
+
+	return savegame;
+}
+
+Savegame loadSavegameFromString(const std::string& fileStream)
+{
+	std::stringstream stream;
+
+	stream.str(fileStream);
+
+	std::cout << "The stream has been loaded. There are " << stream.str().length() << " characters.\n";
+
+	Date d;
+	std::vector<std::vector<std::string>> info;
+
+	for(std::string buffer; std::getline(stream, buffer, '\n'); )
+	{
+		if(lineContainsWarStart(buffer))
+		{
+			std::cout << "Found War!\n";
+
+			std::vector<std::string> lines;
+			std::getline(stream, buffer, '\n');
+			buffer.push_back('\n');
+
+			while((!lineContainsWarStart(buffer)) && (buffer != "}\n"))
+			{
+				lines.emplace_back(buffer);
+
+				if(std::getline(stream, buffer, '\n'))
+				{
+					buffer.push_back('\n');
+				}
+				else
+				{
+					buffer.push_back('\n');
+					buffer.push_back('\0');
+					break;
+				}	
+			}
+			
+			lines.emplace_back(buffer);
+			info.emplace_back(lines);
+		}
+	}
+
+	//This can be parallelized as long as the order for [warTokens] tokens is the same
+	std::vector<std::vector<std::string>> warsTokens;
+	for(const auto& wars : info)
+	{	
+		std::vector<std::string> warTokensVec;	
+		for(const auto& lines : wars)
+		{
+			auto tokenLine = tokenizeLine(lines);
+			
+			for(const auto& tok : tokenLine)
+			{
+				warTokensVec.emplace_back(tok);
+			}
 		}
 		
 		if(!warTokensVec.empty())

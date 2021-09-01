@@ -5,6 +5,7 @@
 #include "../Data/Savegame.h"
 
 Savegame loadSavegame(const std::string& filepath);
+Savegame loadSavegameFromString(const std::string& fileStream);
 
 std::vector<std::string> tokenizeLine(const std::string& line);
 
