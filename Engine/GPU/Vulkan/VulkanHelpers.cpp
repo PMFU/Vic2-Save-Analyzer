@@ -6,6 +6,8 @@
 
 #include <imgui.h>
 
+#include "shaderBinaries.h"
+
 namespace bs::vk
 {
 	//GLOBALS
@@ -329,8 +331,8 @@ namespace bs::vk
 	}
 	void createGraphicsPipeline(VkRenderPass& renderPass, VkPipelineLayout& pipelineLayout, VkPipeline& graphicsPipeline, VkDevice device)	
 	{
-		auto vertShaderCode = bs::readFile("res/Shaders/vert.spv");
-		auto fragShaderCode = bs::readFile("res/Shaders/frag.spv");
+		auto vertShaderCode = vert; //bs::readFile("res/Shaders/vert.spv");
+		auto fragShaderCode = frag; //bs::readFile("res/Shaders/frag.spv");
 
 		VkShaderModule vertShaderModule = createShaderModule(vertShaderCode, device);
 		VkShaderModule fragShaderModule = createShaderModule(fragShaderCode, device);
@@ -603,8 +605,8 @@ namespace bs::vk
 
 	void createPipelineDefault(bs::Device& device, VkPipeline& pipeline, VkRenderPass& rpass, VkPipelineLayout& playout, VkDescriptorSetLayout& dlayout) // Add thing for which type of pipeline
 	{
-		auto vertShaderCode = bs::readFile("res/Shaders/vert.spv");
-		auto fragShaderCode = bs::readFile("res/Shaders/frag.spv");
+		auto vertShaderCode = vert; //bs::readFile("res/Shaders/vert.spv");
+		auto fragShaderCode = frag; //bs::readFile("res/Shaders/frag.spv");
 
 		VkShaderModule vertShaderModule = createShaderModule(vertShaderCode, device.getDevice());
 		VkShaderModule fragShaderModule = createShaderModule(fragShaderCode, device.getDevice());
@@ -749,8 +751,8 @@ namespace bs::vk
 	void createUIPipeline(bs::Device& device, VkPipeline& pipeline, VkRenderPass& rpass, VkPipelineLayout& playout, VkDescriptorSetLayout& dlayout)
 	{
 		//Shader Config
-		auto vertShaderCode = bs::readFile("res/Shaders/uivert.spv");
-		auto fragShaderCode = bs::readFile("res/Shaders/uifrag.spv");
+		auto vertShaderCode = uivert; //bs::readFile("res/Shaders/uivert.spv");
+		auto fragShaderCode = uifrag; //bs::readFile("res/Shaders/uifrag.spv");
 
 		VkShaderModule vertShaderModule = createShaderModule(vertShaderCode, device.getDevice());
 		VkShaderModule fragShaderModule = createShaderModule(fragShaderCode, device.getDevice());

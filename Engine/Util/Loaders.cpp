@@ -41,6 +41,35 @@ std::vector<char> bs::readFile(const std::string& filePath)
 
 	file.close();
 
+	/*std::ofstream f(filePath + ".h");
+	f.clear();
+	f << "static char " << "array[]" << " = {\n\t";
+	int i = 0;
+	bool start = true;
+	for(const auto c : buffer)
+	{
+		if(start)
+		{
+			start = false;
+			f << (int)c;
+			continue;
+		}
+		else
+		{
+			f << ", ";
+		}
+
+		f << (int)c;
+		i += 1;
+		if(i >= 5)
+		{
+			i = 0;
+			f << "\n\t";
+		}
+	}
+	f << std::dec << "\n};\n";
+	f.close();*/
+
 	return buffer;
 }
 
