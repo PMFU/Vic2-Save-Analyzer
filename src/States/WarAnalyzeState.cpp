@@ -324,7 +324,6 @@ void WarAnalyzeState::updateGUI()
 
 	auto battle = [&]()
 	{
-		
 		if(ImGui::BeginChild("Battle", {0.0f, 0.0f}, false, windowflag))
 		{
 			if(selectedBattle < 0)
@@ -333,13 +332,43 @@ void WarAnalyzeState::updateGUI()
 				return;
 			}
 
+			const float width = ImGui::GetWindowWidth() / 2;
 			const auto& battle = save.getWars().at(selectedWarName).battles[selectedBattle];
 
+			//Top Description
+			ImGui::SetWindowFontScale(2.0f);
+			ImGui::Text("%s", battle.name.c_str());
+			
+			//String for total losses
+			const auto losses = std::to_string(battle.atklosses + battle.deflosses);
+			//String for "Attacker Won"/"Lost"
+			const auto resultVictory = std::string("Attacker ").append((battle.doesAttackerWin) ? ("Won") : ("Lost"));
+			//String for location
+			const auto loc = std::to_string(battle.location);
+			//String for date
+			const Date d;
+			const auto battleDate = d.getText();
+
+			ImGui::Text("Casualties: %s\t\tResult: %s", losses.c_str(), resultVictory.c_str());
+			ImGui::Text("Date: %s\t\tLocation: %s", battleDate.c_str(), loc.c_str());
+			
+
+			ImGui::SetWindowFontScale(1.0f);
+			
+			//Attacker Side
 			ImGui::BeginGroup();
 
 			ImGui::Text("Attacker");
 
+			ImGui::Dummy(ImVec2(width, 12.0f));
+
 			ImGui::Text("Country: %s", battle.countryATK);
+
+			ImGui::Text("Leader: %s", battle.leaderATK.c_str());
+
+			const auto atkLosses = std::to_string(battle.atklosses);
+			ImGui::Text("Losses : %s", atkLosses);
+
 			ImGui::Text("Units:");
 			
 			for(const auto& unit : battle.atkUnits)
@@ -348,16 +377,22 @@ void WarAnalyzeState::updateGUI()
 				ImGui::Text("\t%s : %s", unit.name.c_str(), unitsize.c_str());
 			}
 
-			const auto atkLosses = std::to_string(battle.atklosses);
-			ImGui::Text("Losses : %s", atkLosses);
-
 			ImGui::EndGroup();
 			ImGui::SameLine();
+			//Defender Side
 			ImGui::BeginGroup();
 
 			ImGui::Text("Defender");
 
+			ImGui::Dummy(ImVec2(width, 12.0f));
+
 			ImGui::Text("Country: %s", battle.countryDEF);
+
+			ImGui::Text("Leader: %s", battle.leaderDEF.c_str());
+
+			const std::string defLosses = std::to_string(battle.deflosses);
+			ImGui::Text("Losses : %s", defLosses.c_str());
+
 			ImGui::Text("Units:");
 			
 			for(const auto& unit : battle.defUnits)
@@ -366,9 +401,6 @@ void WarAnalyzeState::updateGUI()
 				ImGui::Text("\t%s : %s", unit.name.c_str(), unitsize.c_str());
 			}
 
-			const std::string defLosses = std::to_string(battle.deflosses);
-			ImGui::Text("Losses : %s", defLosses.c_str());
-
 			ImGui::EndGroup();
 		}
 		ImGui::EndChild();
@@ -376,6 +408,7 @@ void WarAnalyzeState::updateGUI()
 
 	if(ImGui::Begin("Big Screen", nullptr, windowflag))
 	{
+		ImGui::SetWindowFontScale(2.0f);
 		ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
 		ImGui::SetWindowSize(io.DisplaySize);
 
