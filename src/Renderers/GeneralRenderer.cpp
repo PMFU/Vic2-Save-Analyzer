@@ -8,7 +8,7 @@ GeneralRenderer::GeneralRenderer(bs::Device* mainDevice, VkRenderPass* rpass, Vk
 	m_renderpass = rpass;
 
 	// Mesh
-	std::string flatplane("flatplane");
+	/*std::string flatplane("flatplane");
 	void* data[] = { p_device, &flatplane };
 
 	//Num Models
@@ -30,7 +30,7 @@ GeneralRenderer::GeneralRenderer(bs::Device* mainDevice, VkRenderPass* rpass, Vk
 		}, data);
 		
 		jobSystem.schedule(load);
-	}
+	}*/
 
 	//Renderlists for secondary cmd buffers
 	m_renderlist.resize(2);

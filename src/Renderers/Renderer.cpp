@@ -16,20 +16,27 @@ Renderer::Renderer(bs::Device* renderingDevice)
 	bs::asset_manager->addTexture(font, 0);	//adds empty texture, gets updated later
 
 	//Texture
-	bs::Image img2;
+	/*bs::Image img2;
 	if (img2.loadFromFile("res/papertexture.jpg"))
 	{
 		std::cout << "Image creation success \n";
 	}
-
+*//*
 	bs::vk::Texture texture(renderingDevice);
 	texture.loadFromImage(img2);
-	bs::asset_manager->addTexture(texture, 1);
+	bs::asset_manager->addTexture(texture, 1);*/
 
 	
 	//Blank white img
 	bs::Image imgblank;
 	imgblank.create(32, 32, bs::u8vec4(255));
+
+// Duping img
+	bs::vk::Texture texture(renderingDevice);
+	texture.loadFromImage(imgblank);
+	bs::asset_manager->addTexture(texture, 1);
+//Img
+
 	//Generate a special image: (diagonal purple)
 	{
 		constexpr bs::u8vec4 purple = bs::u8vec4(255, 0, 255, 255);

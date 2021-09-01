@@ -156,6 +156,7 @@ void WarAnalyzeState::updateGUI()
 					{
 						fromFilepicker = true;
 						save = loadSavegameFromString(fileString);
+						loaded = true;
 					}
 					else
 					{
