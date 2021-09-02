@@ -431,6 +431,11 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 						isBattle = false;
 						curBattleScope = 9999;
 
+						/*if(battleStream.empty()) //(curBattleScope - 1) >= scopeDepth
+						{
+							break;
+						}*/
+
 						if(battleStream.at(0) != battle)
 						{
 							battleStream.clear();
@@ -639,7 +644,7 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 					//std::cout << "THE STRING LITERAL: |" << stringliteral << "|\n";
 					
 
-					if(currentSection == result) { (stringliteral == "yes") ? b.doesAttackerWin = true : b.doesAttackerWin = false; break; }
+					if(currentSection == result) { contains(stringliteral, "y") ? b.doesAttackerWin = true : b.doesAttackerWin = false; break; }
 
 					if(currentSection == losses) { (sideStatus > 1) ? b.deflosses = std::stoi(stringliteral): b.atklosses = std::stoi(stringliteral); break; }
 					if(currentSection == location) { b.location = std::stoi(stringliteral); break; }
