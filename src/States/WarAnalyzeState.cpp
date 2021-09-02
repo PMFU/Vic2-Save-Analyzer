@@ -8,8 +8,7 @@
 
 WarAnalyzeState::WarAnalyzeState(Application& app)	:	Basestate(app)
 {
-	/*
-	bs::Transform t;
+	/*bs::Transform t;
 	bs::GameObject gobj(t);
 
 	gobj.material.texture_id = 2;
@@ -172,6 +171,7 @@ void WarAnalyzeState::updateGUI()
 				if(!fileString.empty())
 				{
 					fromFilepicker = true;
+					fileToLoad = "Selected Save File";
 				}
 				else
 				{

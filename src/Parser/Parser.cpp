@@ -15,8 +15,6 @@ static const std::string tokenSplitterStr =
 	'{', '}', '"', '[', ']', '\n', '=', '(', ')' //, ' '
 };
 
-static const std::string warStart = "previous_war=";
-
 static inline bool contains(const std::string& parentString, const std::string& containStr)
 {
 	if(parentString.empty() || containStr.empty())
@@ -45,6 +43,51 @@ static inline bool lineContainsWarStart(const std::string& containStr)
 	{
 		return false;
 	}
+}
+
+static bool getDateFromPdxString(const std::string& suspectString, Date& d)
+{
+	bool result = false;
+
+	if(!contains(suspectString, "battle"))
+	{
+		if(suspectString.length() < 12)
+		{
+			int year = 0;
+			int month = 0;
+			int day = 0;
+
+			int indexPoint = suspectString.find_first_of('.');
+			if(indexPoint == std::string::npos)
+			{
+				std::cout << "Date String Parsing Issue! |" << suspectString << "|\n";
+				result = false;
+				return result;
+			}
+
+			year = std::stoi(suspectString.substr(0, indexPoint - 1)); // Year
+
+			auto monthdaystr = suspectString.substr(indexPoint, suspectString.length() - indexPoint);
+			indexPoint = monthdaystr.find_first_of('.');
+
+			if(indexPoint == std::string::npos)
+			{
+				std::cout << "Date String Parsed Wrong! |" << suspectString << "|\n";
+				result = false;
+				return result;
+			}
+		
+			result = true;
+
+			month = std::stoi(monthdaystr.substr(0, indexPoint));
+
+			day = std::stoi(monthdaystr.substr(indexPoint + 1, monthdaystr.length() - (indexPoint + 1)));
+			
+			d = Date(year, month, day);
+		}
+	}
+
+	return result;
 }
 
 Savegame loadSavegame(const std::string& filepath)
@@ -286,8 +329,12 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 
 	bool isBattle = false;
 	int curBattleScope = 9999;
-
 	std::vector<std::string> battleStream;
+
+	bool isHistory = false;
+	int curHistoryScope = 9999;
+	std::vector<std::string> HistoryStream;
+	
 
 	std::string stringliteral;
 	std::string currentSection;

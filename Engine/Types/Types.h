@@ -86,16 +86,78 @@ public:
 		this->year = year;
 	}
 
-	/*Date(unsigned short year, unsigned short month, unsigned short day)
+	constexpr Date(u16 year, u16 month, u16 day)
 	{
 		this->year = year;
 		this->day = day;
-		unsigned short nummonths;
-		
 
 
-		
-	}*/
+		//for(int i = month; i > 0; --i)
+		{
+			switch (month)
+			{
+			case 12://Nov
+			{
+				this->day += 30;
+				//break;
+			}
+			case 11://Oct
+			{
+				this->day += 31;
+				//break;
+			}
+			case 10://Sep
+			{
+				this->day += 30;
+				//break;
+			}
+			case 9:	//Aug
+			{
+				this->day += 31;
+				// break;
+			}
+			case 8:	//Jul
+			{
+				this->day += 31;
+				// break;
+			}
+			case 7:	//Jun
+			{
+				this->day += 30;
+				// break;
+			}
+			case 6:	//May
+			{
+				this->day += 31;
+				// break;
+			}
+			case 5:	//Apr
+			{
+				this->day += 30;
+				// break;
+			}
+			case 4:	//March
+			{
+				this->day += 31;
+				// break;
+			}
+			case 3:	//Feb
+			{
+				this->day += 28;
+				// break;
+			}
+			case 2: //Jan
+			{
+				this->day += 31;
+				break;
+			}
+				
+			default:
+				break;
+			}
+		}
+	
+	}
 
 	static uint8_t getMonth(Date date)
 	{

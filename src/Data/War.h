@@ -18,4 +18,5 @@ struct War
 	std::string wargoal;
 
 	Date start;
+	Date end;
 };
