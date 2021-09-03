@@ -277,7 +277,7 @@ void WarAnalyzeState::updateGUI()
 			{
 				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn("Start", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Start[Not Accurate]", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("War Goal", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Location", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Casualties", ImGuiTableColumnFlags_None);
@@ -320,7 +320,8 @@ void WarAnalyzeState::updateGUI()
 						}
 						case 3:	//Location (prov id)
 						{
-							ImGui::Text("%h", battle.location);
+							const auto loc = std::to_string(battle.location);
+							ImGui::Text("%s", loc.c_str());
 							break;
 						}
 						case 4:	//Total Casualties
@@ -378,8 +379,8 @@ void WarAnalyzeState::updateGUI()
 			/*const Date d;
 			const auto battleDate = d.getText();*/
 
-			ImGui::Text("Casualties: %s\t\tResult: %s", losses.c_str(), resultVictory.c_str());
-			ImGui::Text("Date: %s\t\tLocation: %s", "Not Found" /*battleDate.c_str()*/, loc.c_str());
+			ImGui::Text("Casualties: %s\t%s", losses.c_str(), resultVictory.c_str());
+			ImGui::Text("Date: %s\tLocation: %s", "Not Found" /*battleDate.c_str()*/, loc.c_str());
 			
 
 			ImGui::SetWindowFontScale(1.0f);

@@ -443,7 +443,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 						}
 						else
 						{
-							std::cout << "battle stream token 1: |" << battleStream.at(0) << "|\n";
+							//std::cout << "battle stream token 1: |" << battleStream.at(0) << "|\n";
 							battleStream.clear();
 							break;
 						}
@@ -475,7 +475,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 					else if(currentSection == original_wargoal) { /*currentSection = original_wargoal;*/ /*break;*/ }
 					else if(currentSection == original_defender) { w.defenders.emplace_back(original_defender); /*break;*/ }
 					else if(currentSection == original_attacker) { w.attackers.emplace_back(original_attacker); /*break;*/ }
-					else if(currentSection == casus_belli) { w.wargoal = casus_belli; /*break;*/ }
+					else if(currentSection == casus_belli) { w.wargoal = stringliteral; /*break;*/ }
 
 					currentSection.clear();
 					stringliteral.clear();
@@ -513,7 +513,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 				if(token == casus_belli) { currentSection = casus_belli; continue; }
 				if(token == action) { currentSection = action; continue; }
 
-				std::cout << "THIS IS THE UNPARSED TOKEN: |" << token << "| \n";
+				//std::cout << "THIS IS THE UNPARSED TOKEN: |" << token << "| \n";
 
 				//currentSection = token; 
 			}
@@ -629,7 +629,7 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 
 					if(stringliteral.empty())
 					{
-						std::cout << "String Literal is empty\n";
+						//std::cout << "String Literal is empty\n";
 						break;
 					}
 
@@ -821,7 +821,7 @@ void parseWarHistory(War& war, const std::vector<std::string>& tokenStream)
 
 					if(stringliteral.empty())
 					{
-						std::cout << "String Literal is empty\n";
+						//std::cout << "String Literal is empty\n";
 						break;
 					}
 
