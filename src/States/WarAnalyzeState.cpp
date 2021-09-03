@@ -90,6 +90,7 @@ void WarAnalyzeState::updateGUI()
 	auto& io = ImGui::GetIO();
 
 	constexpr auto windowflag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;// | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
+	constexpr auto tableflags = ImGuiTableFlags_Resizable;
 
 	auto topmenu = [&]()
 	{
@@ -187,15 +188,14 @@ void WarAnalyzeState::updateGUI()
 		if(ImGui::BeginChild("WarList", {0.0f, 0.0f}, false, windowflag))
 		{
 			const auto& wars = save.getWars();
-			constexpr auto tableflags = ImGuiTableFlags_Reorderable | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable;
 
 			if(ImGui::BeginTable("WarListTable", 4, tableflags))
 			{
 				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Start", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn("End", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn("Result", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("War Goal", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Battle Count", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
 				for(const auto& [name, war] : wars)
@@ -216,24 +216,25 @@ void WarAnalyzeState::updateGUI()
 
 						switch (column)
 						{
-						case 0:
+						case 0:	//Name
 						{
 							//ImGui::Text(name.c_str());
 							break;
 						}
-						case 1:
+						case 1:	//Start
 						{
-							ImGui::Text(war.start.getText().c_str());
+							ImGui::Text("%s", war.start.getText().c_str());
 							break;
 						}
-						case 2:
+						case 2:	//War Goal
 						{
-							ImGui::Text("End");
+							ImGui::Text("%s", war.wargoal.c_str());
 							break;
 						}
-						case 3:
+						case 3:	//Battle Count
 						{
-							ImGui::Text(war.doesAttackerWin ? "Victory" : "Defeat");
+							//The war end results cannot be parsed, so doing battle count instead
+							ImGui::Text("%lu", war.battles.size());
 							break;
 						}	
 						default:
@@ -253,7 +254,7 @@ void WarAnalyzeState::updateGUI()
 	{
 		const float fifthwidth = io.DisplaySize.x * 0.2f;
 
-		if(ImGui::BeginChild("War", {0.0f, 0.0f}, false, windowflag))
+		if(ImGui::BeginChild("War, Battle Table Menu", {0.0f, 0.0f}, false, windowflag))
 		{
 			const auto& wars = save.getWars();
 			if(selectedWarName.empty())	//If there is no selection
@@ -262,28 +263,22 @@ void WarAnalyzeState::updateGUI()
 				return;
 			}
 
-			ImGui::BeginGroup();	//Left Side Menu
-			ImGui::PushItemWidth(fifthwidth);
+			ImGui::BeginGroup();	//Top Middle Menu
 
 			ImGui::Text("War Menu");
 
-			
-			ImGui::PopItemWidth();
 			ImGui::EndGroup();
-			ImGui::SameLine();
 
 			ImGui::BeginGroup();	//Middle Menu
 
 			const auto& war = wars.at(selectedWarName);
 
-			ImGui::PushItemWidth(fifthwidth * 3); //make sure this is adjusted by the frame size
-
-			if(ImGui::BeginTable("BattleListTable", 6, 0, ImVec2(fifthwidth * 3, 0.0f)))
+			if(ImGui::BeginTable("BattleListTable", 6, tableflags/*, ImVec2(fifthwidth * 3, 0.0f)*/))
 			{
 				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Start", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn("End", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("War Goal", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Location", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Casualties", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Result", ImGuiTableColumnFlags_None);
@@ -297,7 +292,8 @@ void WarAnalyzeState::updateGUI()
 					ImGui::TableSetColumnIndex(0);
 					ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap;
 					bool selected = selectedBattle == battleIndex;
-					if (ImGui::Selectable(battle.name.c_str(), selected, selectable_flags, ImVec2(0.0f, 0.0f)))
+					const auto numberStr = "##" + std::to_string(battleIndex);
+					if (ImGui::Selectable((battle.name + numberStr).c_str(), selected, selectable_flags, ImVec2(0.0f, 0.0f)))
                     {
 						selectedBattle = battleIndex;
 					}
@@ -307,34 +303,34 @@ void WarAnalyzeState::updateGUI()
 
 						switch (column)
 						{
-						case 0:
+						case 0:	//Name
 						{
 							//ImGui::Text(battle.name.c_str());
 							break;
 						}
-						case 1:
+						case 1:	//Start Date
 						{
 							ImGui::Text(war.start.getText().c_str());
 							break;
 						}
-						case 2:
+						case 2:	//War Goal
 						{
-							ImGui::Text("End");
+							ImGui::Text("%s", war.wargoal.c_str());
 							break;
 						}
-						case 3:
+						case 3:	//Location (prov id)
 						{
 							ImGui::Text("%h", battle.location);
 							break;
 						}
-						case 4:
+						case 4:	//Total Casualties
 						{
 							ImGui::Text("%lu", battle.atklosses + battle.deflosses);
 							break;
 						}
-						case 5:
+						case 5:	//Battle Count
 						{
-							ImGui::Text(war.doesAttackerWin ? "Victory" : "Defeat");
+							ImGui::Text(battle.doesAttackerWin ? "Victory" : "Defeat");
 							break;
 						}	
 						default:
@@ -349,16 +345,7 @@ void WarAnalyzeState::updateGUI()
 			}
 
 			ImGui::EndGroup();
-			ImGui::PopItemWidth();
-			ImGui::SameLine();
 			
-			ImGui::BeginGroup();	//Right Side Menu
-			ImGui::PushItemWidth(fifthwidth);
-			
-
-			ImGui::PopItemWidth();
-			ImGui::EndGroup();
-			ImGui::SameLine();
 		}
 		ImGui::EndChild();
 	};
@@ -386,12 +373,13 @@ void WarAnalyzeState::updateGUI()
 			const auto resultVictory = std::string("Attacker ").append((battle.doesAttackerWin) ? ("Won") : ("Lost"));
 			//String for location
 			const auto loc = std::to_string(battle.location);
+			
 			//String for date
-			const Date d;
-			const auto battleDate = d.getText();
+			/*const Date d;
+			const auto battleDate = d.getText();*/
 
 			ImGui::Text("Casualties: %s\t\tResult: %s", losses.c_str(), resultVictory.c_str());
-			ImGui::Text("Date: %s\t\tLocation: %s", battleDate.c_str(), loc.c_str());
+			ImGui::Text("Date: %s\t\tLocation: %s", "Not Found" /*battleDate.c_str()*/, loc.c_str());
 			
 
 			ImGui::SetWindowFontScale(1.0f);
@@ -403,12 +391,12 @@ void WarAnalyzeState::updateGUI()
 
 			ImGui::Dummy(ImVec2(width, 12.0f));
 
-			ImGui::Text("Country: %s", battle.countryATK);
+			ImGui::Text("Country: %s", battle.countryATK.c_str());
 
 			ImGui::Text("Leader: %s", battle.leaderATK.c_str());
 
 			const auto atkLosses = std::to_string(battle.atklosses);
-			ImGui::Text("Losses : %s", atkLosses);
+			ImGui::Text("Losses : %s", atkLosses.c_str());
 
 			ImGui::Text("Units:");
 			
@@ -427,7 +415,7 @@ void WarAnalyzeState::updateGUI()
 
 			ImGui::Dummy(ImVec2(width, 12.0f));
 
-			ImGui::Text("Country: %s", battle.countryDEF);
+			ImGui::Text("Country: %s", battle.countryDEF.c_str());
 
 			ImGui::Text("Leader: %s", battle.leaderDEF.c_str());
 
