@@ -436,14 +436,20 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 							break;
 						}*/
 
-						if(battleStream.at(0) != battle)
+						if(battleStream.at(0) == battle || battleStream.at(0) == "{")
 						{
+							w.battles.emplace_back(convertToBattle(battleStream));
+							battleStream.clear();
+							
+						}
+						else
+						{
+							std::cout << "battle stream token 1: |" << battleStream.at(0) << "|\n";
 							battleStream.clear();
 							break;
 						}
 
-						w.battles.emplace_back(convertToBattle(battleStream));
-						battleStream.clear();
+						
 					}
 
 					break;
@@ -458,24 +464,21 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 					{
 						break;
 					}
-
-					if(currentSection == name) { w.name = stringliteral; break; }
-					if(currentSection == battle) { isBattle = true; curBattleScope = scopeDepth + 1; break; }
-					if(currentSection == history) { /*currentSection = history;*/ break; }
-					if(currentSection == original_wargoal) { /*currentSection = original_wargoal;*/ break; }
-					if(currentSection == original_defender) { w.defenders.emplace_back(original_defender); break; }
-					if(currentSection == original_attacker) { w.attackers.emplace_back(original_attacker); break; }
-					if(currentSection == casus_belli) { w.wargoal = casus_belli; break; }
-					
-					//Starting date for war
-					if(currentSection == action)
+					else if(currentSection == name) { w.name = stringliteral; /*break;*/ }
+					else if(currentSection == action) //Starting date for war
 					{ 
 						if(!getDateFromPdxString(stringliteral, w.start))
 						{
 							std::cout << "Issue with getting the date for the war start.\n";
 						}
-						break; 
+						//break; 
 					}
+					else if(currentSection == battle) { isBattle = true; curBattleScope = scopeDepth + 1; /*break;*/ }
+					else if(currentSection == history) { /*currentSection = history;*/ /*break;*/ }
+					else if(currentSection == original_wargoal) { /*currentSection = original_wargoal;*/ /*break;*/ }
+					else if(currentSection == original_defender) { w.defenders.emplace_back(original_defender); /*break;*/ }
+					else if(currentSection == original_attacker) { w.attackers.emplace_back(original_attacker); /*break;*/ }
+					else if(currentSection == casus_belli) { w.wargoal = casus_belli; /*break;*/ }
 
 					currentSection.clear();
 					stringliteral.clear();
@@ -515,7 +518,7 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 
 				std::cout << "THIS IS THE UNPARSED TOKEN: |" << token << "| \n";
 
-				currentSection = token; 
+				//currentSection = token; 
 			}
 		}
 	}
@@ -703,6 +706,8 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 	return b;
 }
 
+//NOT YET IMPLEMENTED!!!
+//This should take the history token stream, and make battles, joining, etc from it
 void parseWarHistory(War& war, const std::vector<std::string>& tokenStream)
 {
 	Battle b;
@@ -737,7 +742,6 @@ void parseWarHistory(War& war, const std::vector<std::string>& tokenStream)
 	std::string currentSection;
 	std::string stringliteral;
 	std::string unitname;
-
 	currentSection.clear();
 	stringliteral.clear();
 	unitname.clear();
