@@ -116,7 +116,7 @@ Renderer::Renderer(bs::Device* renderingDevice)
 	}
 
 	// Descriptor Pools
-	std::cout << "Num Textures: " << bs::asset_manager->getNumTextures() << "\n";
+	//std::cout << "Num Textures: " << bs::asset_manager->getNumTextures() << "\n";
 
 	VkDescriptorPoolCreateInfo descpoolinfo{};	//Collapse descriptors
 	{

@@ -112,7 +112,7 @@ void Application::RunLoop()
 			io.DeltaTime = dt;
 			io.Framerate = (float)frames;
 			
-			std::cout << frames << " per sec\n";
+			//std::cout << frames << " per sec\n";
 			//std::cout << dt * 1000 << " ms\n";
 			t = 0;
 			frames = 0;

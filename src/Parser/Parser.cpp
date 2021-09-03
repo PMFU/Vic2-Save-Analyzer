@@ -49,8 +49,6 @@ static bool getDateFromPdxString(const std::string& suspectString, Date& d)
 {
 	bool result = false;
 
-	std::cout << "Date Str: " << suspectString << "\n";
-
 	if(!contains(suspectString, "battle"))
 	{
 		if(suspectString.length() < 12)

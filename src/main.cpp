@@ -14,7 +14,7 @@ int main()
 		return 1;
 	}
 
-	std::cout << "End program\n";
+	//std::cout << "End program\n";
 
 	return 0;
 }
