@@ -440,7 +440,6 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 						{
 							w.battles.emplace_back(convertToBattle(battleStream));
 							battleStream.clear();
-							
 						}
 						else
 						{
@@ -448,8 +447,6 @@ War convertToWar(const std::vector<std::string>& tokenStream)
 							battleStream.clear();
 							break;
 						}
-
-						
 					}
 
 					break;
@@ -645,9 +642,22 @@ Battle convertToBattle(const std::vector<std::string>& tokenStream)
 					
 					//std::cout << "THE CURRENT SELECTION: |" << currentSection << "|\n";
 					//std::cout << "THE STRING LITERAL: |" << stringliteral << "|\n";
-					
 
-					if(currentSection == result) { contains(stringliteral, "y") ? b.doesAttackerWin = true : b.doesAttackerWin = false; break; }
+					if(currentSection == result)
+					{ 
+						//std::cout << "Result: StrLiteral: " << stringliteral << "\n";
+						bool victory = contains(stringliteral, "y");
+						//std::cout << "Victory: " << victory << "\n";
+						if(victory)
+						{
+							b.doesAttackerWin = true;
+						}
+						else
+						{
+							b.doesAttackerWin = false;
+						}
+						break; 
+					}
 
 					if(currentSection == losses) { (sideStatus > 1) ? b.deflosses = std::stoi(stringliteral): b.atklosses = std::stoi(stringliteral); break; }
 					if(currentSection == location) { b.location = std::stoi(stringliteral); break; }
