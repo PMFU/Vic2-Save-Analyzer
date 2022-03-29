@@ -1,6 +1,5 @@
 #include "WarAnalyzeState.h"
 
-#include "../Data/Savegame.h"
 #include "../Parser/Parser.h"
 #include "../Parser/Filepicker.h"
 
@@ -8,14 +7,9 @@
 
 WarAnalyzeState::WarAnalyzeState(Application& app)	:	Basestate(app)
 {
-	/*bs::Transform t;
-	bs::GameObject gobj(t);
-
-	gobj.material.texture_id = 2;
-	gobj.material.normal_id = 1;		//FOR TEXTURE MAPPING
-
-	gobj.model_id = "flatplane";
-	m_gameObjects.emplace_back(gobj);*/
+	indexTab = 1;
+	loaded = false;
+	selectedBattle = -1;
 }
 
 WarAnalyzeState::~WarAnalyzeState()
@@ -79,14 +73,6 @@ void WarAnalyzeState::lateUpdate(Camera* cam)
 
 void WarAnalyzeState::updateGUI() 
 {
-	static Savegame save;
-
-	static uint8_t indexTab = 1;
-	static bool loaded = false;
-
-	static std::string selectedWarName;
-	static int selectedBattle = -1;
-
 	auto& io = ImGui::GetIO();
 
 	constexpr auto windowflag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;// | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
@@ -203,7 +189,7 @@ void WarAnalyzeState::updateGUI()
 					ImGui::TableNextRow();
 
 					ImGui::TableSetColumnIndex(0);
-					ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap;
+					const ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap;
 					bool selected = selectedWarName == name;
 					if (ImGui::Selectable(name.c_str(), selected, selectable_flags, ImVec2(0.0f, 0.0f)))
                     {
@@ -260,12 +246,13 @@ void WarAnalyzeState::updateGUI()
 			if(selectedWarName.empty())	//If there is no selection
 			{
 				ImGui::EndChild();
+				indexTab = 2;
 				return;
 			}
 
 			ImGui::BeginGroup();	//Top Middle Menu
 
-			ImGui::Text("War Menu");
+			ImGui::Text("Battles Fought in the War");
 
 			ImGui::EndGroup();
 
@@ -276,7 +263,7 @@ void WarAnalyzeState::updateGUI()
 			if(ImGui::BeginTable("BattleListTable", 6, tableflags/*, ImVec2(fifthwidth * 3, 0.0f)*/))
 			{
 				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
-				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Location Name", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Start[Not Accurate]", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("War Goal", ImGuiTableColumnFlags_None);
 				ImGui::TableSetupColumn("Location", ImGuiTableColumnFlags_None);
@@ -290,7 +277,7 @@ void WarAnalyzeState::updateGUI()
 					ImGui::TableNextRow();
 
 					ImGui::TableSetColumnIndex(0);
-					ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap;
+					const ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap;
 					bool selected = selectedBattle == battleIndex;
 					const auto numberStr = "##" + std::to_string(battleIndex);
 					if (ImGui::Selectable((battle.name + numberStr).c_str(), selected, selectable_flags, ImVec2(0.0f, 0.0f)))
@@ -338,15 +325,11 @@ void WarAnalyzeState::updateGUI()
 							break;
 						}
                     }
-
 					battleIndex += 1;
 				}
-
 				ImGui::EndTable();
 			}
-
 			ImGui::EndGroup();
-			
 		}
 		ImGui::EndChild();
 	};
@@ -358,6 +341,7 @@ void WarAnalyzeState::updateGUI()
 			if(selectedBattle < 0)
 			{
 				ImGui::EndChild();
+				indexTab = 3;
 				return;
 			}
 
@@ -366,7 +350,7 @@ void WarAnalyzeState::updateGUI()
 
 			//Top Description
 			ImGui::SetWindowFontScale(2.0f);
-			ImGui::Text("%s", battle.name.c_str());
+			ImGui::Text("Battle of %s", battle.name.c_str());
 			
 			//String for total losses
 			const auto losses = std::to_string(battle.atklosses + battle.deflosses);
@@ -379,11 +363,26 @@ void WarAnalyzeState::updateGUI()
 			/*const Date d;
 			const auto battleDate = d.getText();*/
 
-			ImGui::Text("Casualties: %s\t%s", losses.c_str(), resultVictory.c_str());
-			ImGui::Text("Date: %s\tLocation: %s", "Not Found" /*battleDate.c_str()*/, loc.c_str());
-			
+			//Casualties in Battle
+			ImGui::Text("Casualties:");
+			ImGui::SameLine(400);
+			ImGui::Text("%s", losses.c_str());
 
+			//Date of Battle
+			ImGui::Text("Date:");
+			ImGui::SameLine(400);
+			ImGui::Text("%s", "Not Found" /*battleDate.c_str()*/);
+			
+			//Locaiton
+			ImGui::Text("Location:");
+			ImGui::SameLine(400);
+			ImGui::Text("%s", loc.c_str());
+			
+			//Result of Battle
+			ImGui::Text("%s", resultVictory.c_str());
+			
 			ImGui::SetWindowFontScale(1.0f);
+			ImGui::Separator();
 			
 			//Attacker Side
 			ImGui::BeginGroup();
@@ -469,12 +468,12 @@ void WarAnalyzeState::updateGUI()
 			break;
 		}
 		
-		ImGui::Separator();
+		// ImGui::Separator();
 
 		if(loaded)
 		{
 			const auto& wars = save.getWars();
-			ImGui::Text("Wars: ");
+			// ImGui::Text("Wars: ");
 
 			/*for(const auto& [name, war] : wars)
 			{

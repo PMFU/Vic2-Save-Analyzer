@@ -1,19 +1,18 @@
-#ifndef GAMESTATE_H
-#define GAMESTATE_H
+#pragma once
 
 #include "Basestate.h"
-
 #include "../Application.h"
 #include "../Controllers/PlayerController.h"
 
-#include <Engine.h>
+#include "../Data/Savegame.h"
 
-#include <atomic>
+#include <Engine.h>
 
 class WarAnalyzeState : public Basestate
 {
 public:
     WarAnalyzeState(Application& app);
+    ~WarAnalyzeState();
 
 	//Add an object to the gamestate list
 	void createObject(bs::Transform& t, const std::string& name);
@@ -28,20 +27,19 @@ public:
 
 	PlayerController& getPlayer() override;
 
-    ~WarAnalyzeState() override;
-protected:
-
-
 private:
 	void updateGUI();
-
 
 	std::vector<bs::GameObject> m_gameObjects;
 	PlayerController m_player;
 
 	Input::Inputs vInput;
 
-	bool hovering = false;
-};
+	Savegame save;
 
-#endif // GAMESTATE_H
+	uint8_t indexTab;
+	bool loaded;
+
+	std::string selectedWarName;
+	int selectedBattle;
+};
