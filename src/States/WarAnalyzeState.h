@@ -12,7 +12,7 @@ class WarAnalyzeState : public Basestate
 {
 public:
     WarAnalyzeState(Application& app);
-    ~WarAnalyzeState();
+    ~WarAnalyzeState() override;
 
 	//Add an object to the gamestate list
 	void createObject(bs::Transform& t, const std::string& name);

@@ -8,7 +8,6 @@
 
 #include <Engine.h>
 
-
 class Renderer
 {
     public:

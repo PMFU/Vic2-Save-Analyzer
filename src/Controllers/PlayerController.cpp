@@ -3,20 +3,15 @@
 
 PlayerController::PlayerController()
 {
-	
 	getCurrentCamera().follow(transform);
-
 
 	// getCurrentCamera().pos = bs::vec3(0.0f, 5.0f, 0.0f);
 	// getCurrentCamera().rot = bs::vec3(90.0f, 0.0f, 0.0f);
 
-	// for the bob
 	// y is height
 	transform.pos = bs::vec3(0.0f, 2.0f, 0.0f);
 	transform.rot = bs::vec3(90.0f, 0.0f, 0.0f);
 	velocity = bs::vec3(0.0f, 0.0f, 0.0f);
-
-	
 }
 
 void PlayerController::getInput(Input::Inputs vInput)
@@ -169,9 +164,4 @@ void PlayerController::update(float dt)
 	const float lowpitchangle = -10.0f; // -15.0f works well cinematically
 
 	transform.rot.x = lowpitchangle * rotscale + 90.0f;
-}
-
-PlayerController::~PlayerController()
-{
-
 }

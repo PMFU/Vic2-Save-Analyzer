@@ -3,7 +3,6 @@
 #include <imgui.h>
 #include <algorithm>
 
-
 constexpr int numDescriptors = 2;
 
 Renderer::Renderer(bs::Device* renderingDevice)

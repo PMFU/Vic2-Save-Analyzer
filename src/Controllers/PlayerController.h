@@ -2,13 +2,11 @@
 
 #include <Engine.h>
 #include "../Camera.h"
-#include "Controller.h"
 
-class PlayerController //: public bs::Transform //: public Controller
+class PlayerController
 {
 public:
     PlayerController();
-    ~PlayerController();
 
     void update(float deltatime);
 
