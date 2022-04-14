@@ -118,13 +118,11 @@ void Application::RunLoop()
 			frames = 0;
 		}
 
-
 		handleEvents();
 	}
 	m_context->close();
 
 	jobSystem.wait();
-
 	m_states.clear();
 }
 
@@ -163,3 +161,7 @@ void Application::handleEvents()
 	//std::cout << "Frame\n";
 }
 
+void Application::requestClose()
+{
+	shouldClose = true;
+}

@@ -2,6 +2,11 @@
 
 Savegame::Savegame()
 {
+
+}
+
+void Savegame::addTestWar()
+{
 	//Test war
 	War w;
 	w.attackers.emplace_back("RUS");
@@ -11,11 +16,6 @@ Savegame::Savegame()
 	w.wargoal = "There is none, this is a test";
 
 	//m_warsmap.insert(std::pair(w.name, w));
-}
-
-Savegame::~Savegame()
-{
-
 }
 
 void Savegame::addWar(const War& war)

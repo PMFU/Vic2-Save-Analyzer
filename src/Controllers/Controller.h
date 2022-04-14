@@ -7,7 +7,7 @@ public:
 
     virtual void update(float deltatime);
 
-    ~Controller();
+    virtual ~Controller() = default;
 private:
     
 };

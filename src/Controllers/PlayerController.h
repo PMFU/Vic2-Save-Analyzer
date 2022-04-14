@@ -8,6 +8,7 @@ class PlayerController //: public bs::Transform //: public Controller
 {
 public:
     PlayerController();
+    ~PlayerController();
 
     void update(float deltatime);
 
@@ -19,7 +20,6 @@ public:
 
     short country = 0;
 
-    ~PlayerController();
 private:
 	Camera debugCamera;
 	Camera gameCamera;

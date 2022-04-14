@@ -1,5 +1,4 @@
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -39,18 +38,8 @@ public:
 
     void popState();
     void handleEvents();
-	// Camera& getCam() 
-	// {
-	// 	return m_camera;
-	// }
 	
-	void requestClose()
-	{
-		shouldClose = true;
-	}
-
-protected:
-
+	void requestClose();
 private:
     std::unique_ptr<Basestate>& currentState();
 
@@ -68,6 +57,3 @@ private:
 	
 	std::vector<std::function<void()>> m_statechanges;
 };
-
-
-#endif // APPLICATION_H

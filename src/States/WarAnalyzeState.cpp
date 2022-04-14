@@ -442,47 +442,40 @@ void WarAnalyzeState::updateGUI()
 		ImGui::SetWindowSize(io.DisplaySize);
 
 		topmenu();
-
 		ImGui::Separator();
-		
 
 		switch (indexTab)
 		{
 		case 1:
 			saveselect();
 			break;
-		
 		case 2:
 			warslist();
 			break;
-
 		case 3:
 			war();
 			break;
-
 		case 4:
 			battle();
 			break;
-		
 		default:
+			indexTab = 1;
 			break;
 		}
-		
-		// ImGui::Separator();
 
-		if(loaded)
+		/*if(loaded)
 		{
 			const auto& wars = save.getWars();
 			// ImGui::Text("Wars: ");
 
-			/*for(const auto& [name, war] : wars)
+			for(const auto& [name, war] : wars)
 			{
 				ImGui::Text("Name: %s, Winner: %s, Battles: %zu", 
 					name.c_str(),
 					(war.doesAttackerWin ? war.attackers.at(0).c_str() : war.defenders.at(0).c_str()),
 					war.battles.size());
-			}*/
-		}
+			}
+		}*/
 	}
 	ImGui::End();
 }
