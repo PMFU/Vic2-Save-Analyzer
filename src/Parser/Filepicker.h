@@ -2,7 +2,7 @@
 
 #include <string>
 
-//@TODO: If someone knows how or can do it, make this so it is cross platform for opening a file selection dialogue box
+//@TODO: Make this so it works across platforms in opening a file selection dialogue box
 //Open Windows File Browsing Dialogue and return the filename and path for the chosen file
 const std::string openFilePickerFilename();
 

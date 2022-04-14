@@ -1,10 +1,6 @@
 #include "Filepicker.h"
 
-
-//I HATE WIN32 AGHHHHH
-//But the cost is worth it, just so users can navigate easier
-
-//@TODO: If someone knows how or can do it, make this so it is cross platform for opening a file selection dialogue box
+//@TODO: Make this so it works across platforms in opening a file selection dialogue box
 #include <Windows.h>
 #include <shobjidl.h> 
 

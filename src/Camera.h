@@ -22,7 +22,7 @@ public:
 private:
 	float lerp;
 	
-	//Mode 0 is default, 1 is Left Eye, 2 is Right Eye	//Or now ig for other stuff THE BOBSTER does
+	//Mode 0 is default, 1 is Left Eye, 2 is Right Eye | may be used for other things
 	int mode;
 
 	bs::mat4 proj;
