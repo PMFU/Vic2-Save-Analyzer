@@ -266,22 +266,20 @@ static inline bool isToken(const char c) noexcept
 	return (tokenSplitterStr.find(c) != std::string::npos);
 }
 
-std::vector<std::string> tokenizeLine(const std::string& line)
+std::vector<std::string> tokenizeLine(std::string_view line)
 {
 	std::vector<std::string> tokens;
 	std::string curToken;
-
 	//For every character in the line, check if it's a token splitter
 	//If it splits the token, then push the existing token to the vector, and then the token splitter
-	for(const char c : line)
+	for(const auto c : line)
 	{
 		if(!isToken(c))
 		{
 			curToken.push_back(c);
 		}
 		else
-		{
-			//Push the current string token to the vector
+		{	//Push the current string token to the vector
 			if(!curToken.empty())
 			{
 				tokens.emplace_back(curToken);
@@ -293,15 +291,13 @@ std::vector<std::string> tokenizeLine(const std::string& line)
 			tokens.emplace_back(tokenChar);
 		}
 	}
-
 	//Another check in case of unfinished token or smth
 	if(!curToken.empty())
 	{
 		tokens.emplace_back(curToken);
 		curToken.clear();
 	}
-
-	return tokens;
+	return std::move(tokens);
 }
 
 War convertToWar(const std::vector<std::string>& tokenStream)

@@ -90,7 +90,7 @@ namespace bs
 
 	void Context::initAPI()
 	{
-		bs::vk::createInstance("Bathsalts");
+		bs::vk::createInstance("Basalt");
 		bs::vk::createSurface(m_window);
 		m_Device->init();
 		bs::vk::createSwapChain(m_swapchain, *m_Device, m_scdetails, m_window);

@@ -7,7 +7,7 @@
 Savegame loadSavegame(const std::string& filepath);
 Savegame loadSavegameFromString(const std::string& fileStream);
 
-std::vector<std::string> tokenizeLine(const std::string& line);
+std::vector<std::string> tokenizeLine(std::string_view line);
 
 War convertToWar(const std::vector<std::string>& tokenStream);
 

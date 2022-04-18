@@ -15,43 +15,43 @@ const std::string openFilePicker()
 	//Init the COM library
 	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
-    if (SUCCEEDED(hr))
-    {
-        IFileOpenDialog *pFileOpen;
+	if (SUCCEEDED(hr))
+	{
+		IFileOpenDialog *pFileOpen;
 
-        // Create the FileOpenDialog object.
-        hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
-                IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+		// Create the FileOpenDialog object.
+		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
+				IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
 
-        if (SUCCEEDED(hr))
-        {
-            // Show the Open dialog box.
-            hr = pFileOpen->Show(NULL);
+		if (SUCCEEDED(hr))
+		{
+			// Show the Open dialog box.
+			hr = pFileOpen->Show(NULL);
 
-            // Get the file name from the dialog box.
-            if (SUCCEEDED(hr))
-            {
-                IShellItem *pItem;
-                hr = pFileOpen->GetResult(&pItem);
-                if (SUCCEEDED(hr))
-                {
+			// Get the file name from the dialog box.
+			if (SUCCEEDED(hr))
+			{
+				IShellItem *pItem;
+				hr = pFileOpen->GetResult(&pItem);
+				if (SUCCEEDED(hr))
+				{
 					//This gets the string for the file
-                    PWSTR pszFilePath;
-                    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+					PWSTR pszFilePath;
+					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 
-                    // Display the file name to the user.
-                    if (SUCCEEDED(hr))
-                    {
-                    	//filepath = std::string(pszFilePath);
-                        CoTaskMemFree(pszFilePath);
-                    }
-                    pItem->Release();
-                }
-            }
-            pFileOpen->Release();
-        }
-        CoUninitialize();
-    }
+					// Display the file name to the user.
+					if (SUCCEEDED(hr))
+					{
+						//filepath = std::string(pszFilePath);
+						CoTaskMemFree(pszFilePath);
+					}
+					pItem->Release();
+				}
+			}
+			pFileOpen->Release();
+		}
+		CoUninitialize();
+	}
 
 	return filepath;
 }
@@ -63,36 +63,31 @@ const std::string openFilePickerFile()
 
 	//Init the COM library
 	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+	if (SUCCEEDED(hr))
+	{
+		IFileOpenDialog *pFileOpen;
+		// Create the FileOpenDialog object.
+		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
+				IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
 
-    if (SUCCEEDED(hr))
-    {
-        IFileOpenDialog *pFileOpen;
-
-        // Create the FileOpenDialog object.
-        hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
-                IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
-
-        if (SUCCEEDED(hr))
-        {
-            // Show the Open dialog box.
-            hr = pFileOpen->Show(NULL);
-
-            // Get the file name from the dialog box.
-            if (SUCCEEDED(hr))
-            {
-                IShellItem *pItem;
-                hr = pFileOpen->GetResult(&pItem);
-                if (SUCCEEDED(hr))
-                {
+		if (SUCCEEDED(hr))
+		{
+			// Show the Open dialog box.
+			hr = pFileOpen->Show(NULL);
+			// Get the file name from the dialog box.
+			if (SUCCEEDED(hr))
+			{
+				IShellItem *pItem;
+				hr = pFileOpen->GetResult(&pItem);
+				if (SUCCEEDED(hr))
+				{
 					//This gets the string for the file
-                    PWSTR pszFilePath;
-                    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+					PWSTR pszFilePath;
+					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 
-					pszFilePath;
-					// pFileOpen->?
-                    // Display the file name to the user.
-                    if (SUCCEEDED(hr))
-                    {
+					// Display the file name to the user.
+					if (SUCCEEDED(hr))
+					{
 						std::wstring path(pszFilePath);
 						std::ifstream save(path);
 
@@ -100,7 +95,7 @@ const std::string openFilePickerFile()
 						{
 							std::stringstream stream;
 							stream << save.rdbuf();
-
+							
 							file = stream.str();
 						}
 						else
@@ -108,15 +103,15 @@ const std::string openFilePickerFile()
 							throw("Selected Save File could not be opened!");
 						}
 
-                        CoTaskMemFree(pszFilePath);
-                    }
-                    pItem->Release();
-                }
-            }
-            pFileOpen->Release();
-        }
-        CoUninitialize();
-    }
+						CoTaskMemFree(pszFilePath);
+					}
+					pItem->Release();
+				}
+			}
+			pFileOpen->Release();
+		}
+		CoUninitialize();
+	}
 
 	return file;
 }
