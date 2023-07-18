@@ -10,6 +10,8 @@ Savegame loadSavegameFromString(const std::string& fileStream);
 std::vector<std::string> tokenizeLine(std::string_view line);
 
 War convertToWar(const std::vector<std::string>& tokenStream);
+Prices convertToPrices(const std::vector<std::string>& tokenStream);
+
 
 Battle convertToBattle(const std::vector<std::string>& tokenStream);
 

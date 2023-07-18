@@ -1,6 +1,7 @@
 #include "Menustate.h"
 
 #include "WarAnalyzeState.h"
+#include "EcoAnalyzeState.h"
 
 Menustate::Menustate(Application& app) : Basestate(app)
 {
@@ -40,6 +41,11 @@ void Menustate::update(float dt)
 		if(ImGui::Button("War Analyzer"))
 		{
 			app.pushState(std::make_unique<WarAnalyzeState>(WarAnalyzeState(app)));
+		}
+
+		if(ImGui::Button("Eco Analyzer"))
+		{
+			app.pushState(std::make_unique<EcoAnalyzeState>(EcoAnalyzeState(app)));
 		}
 	}
 

@@ -1,5 +1,6 @@
 {
 	"files.associations": {
+		"*.rpy": "makefile",
 		"functional": "cpp",
 		"algorithm": "cpp",
 		"array": "cpp",
@@ -75,6 +76,9 @@
 		"xtr1common": "cpp",
 		"xtree": "cpp",
 		"xutility": "cpp",
-		"future": "cpp"
-	}
+		"future": "cpp",
+		"charconv": "cpp",
+		"format": "cpp"
+	},
+	"C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

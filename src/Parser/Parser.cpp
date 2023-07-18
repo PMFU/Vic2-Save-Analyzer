@@ -45,6 +45,19 @@ static inline bool lineContainsWarStart(const std::string& containStr)
 	}
 }
 
+static inline bool lineContainsEco(const std::string& containStr)
+{
+	const std::string str("price");
+	if(containStr.find(str) != std::string::npos)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 static bool getDateFromPdxString(const std::string& suspectString, Date& d)
 {
 	bool result = false;
@@ -102,18 +115,43 @@ Savegame loadSavegame(const std::string& filepath)
 	std::stringstream stream;
 	stream << file.rdbuf();
 	file.close();
-
 	std::cout << "The stream has been loaded. There are " << stream.str().length() << " characters.\n";
 
 	Date d;
-	std::vector<std::vector<std::string>> info;
+	std::vector<std::vector<std::string>> infoWar;
+	std::vector<std::vector<std::string>> infoEco;
 
 	for(std::string buffer; std::getline(stream, buffer, '\n'); )
 	{
+		if(lineContainsEco(buffer))
+		{
+			//Found eco line
+			std::vector<std::string> lines;
+			std::getline(stream, buffer, '\n');
+			buffer.push_back('\n');
+
+			while((!lineContainsEco(buffer)) && (buffer != "}\n"))
+			{
+				lines.emplace_back(buffer);
+
+				if(std::getline(stream, buffer, '\n'))
+				{
+					buffer.push_back('\n');
+				}
+				else
+				{
+					buffer.push_back('\n');
+					buffer.push_back('\0');
+					break;
+				}	
+			}
+			lines.emplace_back(buffer);
+			infoEco.emplace_back(lines);
+		}
+
 		if(lineContainsWarStart(buffer))
 		{
-			std::cout << "Found War!\n";
-
+			//Found War
 			std::vector<std::string> lines;
 			std::getline(stream, buffer, '\n');
 			buffer.push_back('\n');
@@ -133,52 +171,73 @@ Savegame loadSavegame(const std::string& filepath)
 					break;
 				}	
 			}
-			
 			lines.emplace_back(buffer);
-			info.emplace_back(lines);
+			infoWar.emplace_back(lines);
 		}
 	}
 
-	//This can be parallelized as long as the order for [warTokens] tokens is the same
 	std::vector<std::vector<std::string>> warsTokens;
-	for(const auto& wars : info)
-	{	
-		std::vector<std::string> warTokensVec;	
+	std::vector<std::vector<std::string>> ecoTokens;
+	for(const auto& wars : infoWar)
+	{
+		std::vector<std::string> warTokensVec;
 		for(const auto& lines : wars)
 		{
 			auto tokenLine = tokenizeLine(lines);
-			
 			for(const auto& tok : tokenLine)
 			{
 				warTokensVec.emplace_back(tok);
 			}
 		}
-		
 		if(!warTokensVec.empty())
 		{
 			warsTokens.push_back(warTokensVec);
-			std::cout << "Made a war token list.\n";
+			//Made War Token List
 		}	
 	}
 
-	Savegame savegame;
+	for(const auto& price_ : ecoTokens)
+	{
+		std::vector<std::string> ecoTokensVec;	
+		for(const auto& lines : price_)
+		{
+			auto tokenLine = tokenizeLine(lines);
+			for(const auto& tok : tokenLine)
+			{
+				ecoTokensVec.emplace_back(tok);
+			}
+		}
+		if(!ecoTokensVec.empty())
+		{
+			ecoTokens.push_back(ecoTokensVec);
+			//Made Eco Token List
+		}	
+	}
 
+
+
+	Savegame savegame;
 	for(const auto& wtoken : warsTokens)
 	{
-		if(wtoken.size() == 0)
+		if(wtoken.size() > 0)
 		{
-			continue;
-		}
-		else
-		{
+			//Added War to internal savegame data
 			savegame.addWar(convertToWar(wtoken));
-			std::cout << "Made a war.\n";
 		}
 	}
 
+	for(const auto& etoken : ecoTokens)
+	{
+		if(etoken.size() > 0)
+		{
+			//Added War to internal savegame data
+			savegame.addPriceHistory(convertToPrices(etoken));
+		}
+	}
 	return savegame;
 }
 
+//SAVE GAME LOADER
 Savegame loadSavegameFromString(const std::string& fileStream)
 {
 	std::stringstream stream;
@@ -298,6 +357,189 @@ std::vector<std::string> tokenizeLine(std::string_view line)
 		curToken.clear();
 	}
 	return std::move(tokens);
+}
+
+Prices convertToPrices(const std::vector<std::string>& tokenStream)
+{
+	Prices p;
+
+	//Scope and Flags
+	int scopeDepth = 0; //Everytime there is '{', increment, and when '}', decrement
+	int bracketDepth = 0; //Everytime there is '[', increment, and when ']', decrement
+	int parenthesisDepth = 0; //Everytime there is '(', increment, and when ')', decrement
+
+	bool isLeftOperand = true; 
+
+	bool isBattle = false;
+
+	std::string stringliteral;
+	std::string currentSection;
+	//@TODO: FINISH THIS
+
+
+	/*for(auto index = 0; index < tokenStream.size(); ++index)
+	{
+		const auto& tkn = tokenStream[index];
+		if(tkn.empty())
+		{
+			continue;
+		}
+
+		std::string token;
+
+		if(tkn.at(0) == '\t')
+		{
+			auto x = tkn.find_first_not_of('\t');
+			if(x == std::string::npos) { continue; }
+
+			token = tkn.substr(x, tkn.length() - x);
+		}
+		else
+		{
+			token = tkn;
+		}
+
+		if(isToken(token.at(0)))
+		{
+			if(isBattle)
+			{
+				battleStream.emplace_back(token);
+			}
+
+			switch (token.at(0))
+			{	//Begin Switch
+				case '"':
+				{
+					stringliteral.clear();
+					index += 1;
+
+					while(tokenStream[index].at(0) != '"')
+					{
+						//Add the token to the battle stream if in it
+						if(isBattle)
+						{
+							battleStream.emplace_back(tokenStream[index]);
+						}
+
+						//Add the token to the string literal string
+						stringliteral.append(tokenStream[index]);
+						index += 1;
+					}
+
+					if(isBattle)
+					{
+						battleStream.emplace_back("\"");
+					}
+
+					break;
+				}
+				case '(':
+				{
+					parenthesisDepth += 1;
+					break;
+				}
+				case ')':
+				{
+					parenthesisDepth -= 1;
+					break;
+				}
+				case '[':
+				{
+					bracketDepth += 1;
+					break;
+				}
+				case ']':
+				{
+					bracketDepth -= 1;
+					break;
+				}
+				case '{':
+				{
+					scopeDepth += 1;
+					break;
+				}
+				case '}':
+				{	
+					scopeDepth -= 1;
+
+					//End the battle token stream
+					if((curBattleScope - 1) == scopeDepth)
+					{
+						isBattle = false;
+						curBattleScope = 9999;
+
+
+						if(battleStream.at(0) == battle || battleStream.at(0) == "{")
+						{
+							w.battles.emplace_back(convertToBattle(battleStream));
+							battleStream.clear();
+						}
+						else
+						{
+							//std::cout << "battle stream token 1: |" << battleStream.at(0) << "|\n";
+							battleStream.clear();
+							break;
+						}
+					}
+
+					break;
+				}
+
+				//Others
+				case '\n':
+				{
+					isLeftOperand = true;
+
+					if(isBattle)
+					{
+						break;
+					}
+
+					currentSection.clear();
+					stringliteral.clear();
+
+					break;
+				}
+				case '=':
+				{
+					isLeftOperand = false;
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+			}	//End Switch
+		}
+		else
+		{
+			if(isBattle)
+			{
+				battleStream.emplace_back(token);
+				continue;
+			}
+
+			if(isLeftOperand)
+			{
+				if(token == name) { currentSection = name; continue; }
+				if(token == battle) { currentSection = battle; continue; }
+				if(token == history) { currentSection = history; continue; }
+				if(token == original_wargoal) { currentSection = original_wargoal; continue; }
+				if(token == original_defender) { currentSection = original_defender; continue; }
+				if(token == original_attacker) { currentSection = original_attacker; continue; }
+				if(token == casus_belli) { currentSection = casus_belli; continue; }
+				if(token == action) { currentSection = action; continue; }
+
+				//std::cout << "THIS IS THE UNPARSED TOKEN: |" << token << "| \n";
+
+				//currentSection = token; 
+			}
+		}
+	}*/
+
+
+	return p;
 }
 
 War convertToWar(const std::vector<std::string>& tokenStream)

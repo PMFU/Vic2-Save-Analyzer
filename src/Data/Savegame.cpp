@@ -23,7 +23,17 @@ void Savegame::addWar(const War& war)
 	m_warsmap.insert(std::pair(war.name, war));
 }
 
+void Savegame::addPriceHistory(const Prices& prices)
+{
+	m_pricesmap.insert(std::pair(m_pricesmap.size(), prices));
+}
+
 const std::unordered_map<std::string, War>& Savegame::getWars() const noexcept
 {
 	return m_warsmap;
+}
+
+const std::unordered_map<int, Prices>& Savegame::getPriceHistory() const noexcept
+{
+	return m_pricesmap;
 }
